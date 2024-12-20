@@ -1,5 +1,5 @@
 repos:
-  - repo: https://gitlab-stud.elka.pw.edu.pl/mmachnik/psi-projekt
+  - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
     rev: v0.8.4
     hooks:
