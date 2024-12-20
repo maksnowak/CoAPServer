@@ -1,31 +1,32 @@
 # PSI Serwer CoAP
 
+*Autorzy: Michał Machnikowski, Maksymilian Nowak, Bruno Sienkiewicz*
+
 ## Treść zadania
 
 Celem projektu jest implementacja serwera CoAP, który będzie obsługiwał przynajmniej żądania `GET`, `POST`, `PUT`, oraz `DELETE`.
 Serwer powinien posiadać odpowiednio skonstruowaną architekturę - tak, aby łatwo było dodać nową funkcję obsługującą żądania przychodzące na dany URL.
 
-Planujemy stworzyć moduł do systemu kontroli temperatury, który będzie realizował komunikację między czujnikami i centralnym serwerem.
-
 ## Założenia
 
 ### Funkcjonalne
 
-Nasza biblioteka będzie umożliwiała następujące funkcje:
-- Dodawanie czujników
-- Usuwanie czujników
-- Modyfikacja statusu czujników
-- Pobranie odczytów temperatur
-
-Dodatkowo, serwer będzie generował logi ze wszystkimi wydarzeniami, które wystąpiły podczas jego działania
+- Serwer będzie obsługiwał żądania zgodnie z protokołem CoAP
+- Serwer będzie obsługiwał żądania `GET`, `POST`, `PUT`, oraz `DELETE`
+- Serwer będzie zwracał odpowiednie kody odpowiedzi
+- Serwer będzie generował logi ze wszystkimi zdarzeniami, które wystąpiły podczas jego działania
+- Serwer będzie organizował dane w hierachię zasobów, gdzie każdy zasób będzie miał swój unikalny URL
+- Serwer będzie pozwalał na obsługę wielu klientów jednocześnie
 
 ### Niefunkcjonalne
 
-- Biblioteka ma architekturę pozwalającą na łatwą rozbudowę aplikacji o nowe żądania
-- Serwer pozwala na jednoczesną obsługę wielu klientów
-- Serwer ma poprawnie działać na dowolnej platformie Linux/Unix
+- Serwer ma architekturę pozwalającą na łatwą rozbudowę aplikacji o nowe żądania
+- Serwer pozwala na jednoczesną obsługę wielu klientów bez utraty wydajności
+- Serwer ma poprawnie działać na platformie Linux
 
 ## Przypadki użycia
+
+Serwer będzie służył do obsługi żądań do sieci urządzeń IoT. Przykładowo, zakładając, że serwer będzie obsługiwał czujniki temperatury, to możliwe przypadki użycia to:
 
 - `GET`: Odczytywanie bieżącej temperatury na czujniku
 - `POST`: Zarejestrowanie nowego czujnika
@@ -65,6 +66,11 @@ Poszczególne kontenery będą reprezentować elementy architektury, które będ
 
 ## API
 
+W projekcie planowane są trzy główne bloki funkcjonalne: 
+- Uruchomienie serwera
+- Nasłuchiwanie przychodzących żądań
+- Obsługa żądań
+
 ## Sposób testowania
 
 - Testy jednostkowe
@@ -75,9 +81,24 @@ Poszczególne kontenery będą reprezentować elementy architektury, które będ
 
 ## Podział prac w zespole
 
+- Przygotowanie środowiska - Bruno Sienkiewicz
+- Szkielet aplikacji - Bruno Sienkiewicz, Maksymilian Nowak
+- Metoda `GET` (+ testy) - Michał Machnikowski
+- Metoda `POST` (+ testy) - Maksymilian Nowak
+- Metoda `PUT` (+ testy) - Michał Machnikowski 
+- Metoda `DELETE` (+ testy) - Bruno Sienkiewicz
+- Dokumentacja - Michał Machnikowski, Maksymilian Nowak, Bruno Sienkiewicz
+
 ## Przewidywane funkcje do zademonstrowania w ramach odbioru częściowego
 
-- Działająca metoda `GET`
-- Działająca metoda `POST`
+- Szkielet aplikacji
+- Deklaracja każdej z metod (mocki)
+- W pełni działająca metoda `GET`
 
 ## Plan pracy z podziałem na tygodnie
+
+- 23.12 - 29.12: Przygotowanie środowiska
+- 30.12 - 05.01: Stworzenie szkieletu aplikacji
+- 06.01 - 12.01: Implementacja metody `GET`
+- 13.01 - 19.01: Implementacja pozostałych metod, przygotowanie testów
+- 20.01 - 24.01: Weryfikacja poprawności rozwiązania, przygotowanie dokumentacji końcowej
