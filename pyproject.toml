@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "psi-projekt"
+version = "0.1.0"
+description = "Celem projektu jest implementacja serwera CoAP, który będzie obsługiwał przynajmniej żądania GET, POST, PUT, oraz DELETE."
+authors = ["Serwer powinien posiadać odpowiednio skonstruowaną architekturę - tak, aby łatwo było dodać nową funkcję obsługującą żądania przychodzące na dany URL."]
+license = ""
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+mypy = "^1.13.0"
+pytest = "^8.3.4"
+ruff = "^0.8.4"
+pre-commit = "^4.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

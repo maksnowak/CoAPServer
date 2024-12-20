@@ -1,0 +1,10 @@
+repos:
+  - repo: https://gitlab-stud.elka.pw.edu.pl/mmachnik/psi-projekt
+    # Ruff version.
+    rev: v0.8.4
+    hooks:
+      # Run the linter.
+      - id: ruff
+        args: [--fix]
+      # Run the formatter.
+      - id: ruff-format
