@@ -17,16 +17,28 @@ Nasza biblioteka będzie umożliwiała następujące funkcje:
 - Modyfikacja statusu czujników
 - Pobranie odczytów temperatur
 
+Dodatkowo, serwer będzie generował logi ze wszystkimi wydarzeniami, które wystąpiły podczas jego działania
+
 ### Niefunkcjonalne
+
+- Biblioteka ma architekturę pozwalającą na łatwą rozbudowę aplikacji o nowe żądania
+- Serwer pozwala na jednoczesną obsługę wielu klientów
+- Serwer ma poprawnie działać na dowolnej platformie Linux/Unix
 
 ## Przypadki użycia
 
-GET: Odczytywanie bieżącej temperatury na czujniku
-POST: Zarejestrowanie nowego czujnika
-PUT: Aktualizacja temperatury czujnika
-DELETE: Usunięcie czujnika
+- `GET`: Odczytywanie bieżącej temperatury na czujniku
+- `POST`: Zarejestrowanie nowego czujnika
+- `PUT`: Aktualizacja temperatury czujnika
+- `DELETE`: Usunięcie czujnika
 
 ## Analiza sytuacji błędnych
+
+W przypadku wystąpienia sytuacji błędnej, serwer zwróci odpowiedni dla tej sytuacji kod, zgodnie ze specyfikacją [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252#section-5.9):
+- Kod `4.xx` dla błędów po stronie klienta
+- Kod `5.xx` dla błędów po stronie serwera
+
+Każdy błąd będzie zapisany w logach do dalszej analizy; rekord będzie zawierał podstawowe informacje, takie jak data i godzina zdarzenia, adres IP klienta, adres URL żądania oraz kod uzyskany w odpowiedzi.
 
 ## Środowisko sprzętowo-programowe
 
@@ -34,17 +46,17 @@ DELETE: Usunięcie czujnika
   - Ubuntu 24.04
 - Konteneryzacja:
   - Docker
-  - docker compose
+  - `docker compose`
 - Język programowania:
   - Python 3.11
 - Zarządzanie pakietami:
-  - poetry
+  - `poetry`
 - Linter:
-  - ruff
+  - `ruff`
 - Formatter:
-  - ruff
+  - `ruff`
 - Testowanie:
-  - pytest
+  - `pytest`
 
 ## Architektura rozwiązania
 
@@ -59,9 +71,13 @@ Poszczególne kontenery będą reprezentować elementy architektury, które będ
 - Testy integracyjne 
   - poprawność komunikacji klient-serwer
   - stabilność systemu
+- Testy manualne, z opisanym ich przebiegiem w dokumentacji końcowej
 
 ## Podział prac w zespole
 
 ## Przewidywane funkcje do zademonstrowania w ramach odbioru częściowego
+
+- Działająca metoda `GET`
+- Działająca metoda `POST`
 
 ## Plan pracy z podziałem na tygodnie
