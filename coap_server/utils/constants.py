@@ -1,6 +1,8 @@
+from collections.abc import Callable
 from enum import Enum
 
 from coap_server.resources.base_resource import BaseResource
+from coap_server.utils.parser import CoapRequest
 
 
 COAP_CODES = {
@@ -37,7 +39,11 @@ class CoAPMethod(Enum):
     def value(self):
         return self.name
 
-    def get_resource_method(self, resource: BaseResource):
+    @staticmethod
+    def from_str(method: str) -> 'CoAPMethod':
+        return CoAPMethod[method.upper()]
+
+    def get_resource_method(self, resource: BaseResource) -> Callable[[CoapRequest], bytes]:
         if not hasattr(resource, self.value.lower()):
             raise AttributeError(f"Method {self.value} not allowed for this resource.")
         return getattr(resource, self.value.lower())
