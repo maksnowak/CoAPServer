@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "psi-projekt"
+name = "coap-server"
 version = "0.1.0"
 description = "Celem projektu jest implementacja serwera CoAP, który będzie obsługiwał przynajmniej żądania GET, POST, PUT, oraz DELETE. Serwer powinien posiadać odpowiednio skonstruowaną architekturę - tak, aby łatwo było dodać nową funkcję obsługującą żądania przychodzące na dany URL."
 authors = ["Bruno Sienkiewicz", "Maksymilian Nowak", "Michał Machnikowski"]
