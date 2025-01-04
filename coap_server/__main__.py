@@ -3,6 +3,7 @@ import typer
 
 app = typer.Typer()
 
+
 @app.command()
 def start(
     host: str = typer.Option("127.0.0.1", help="The host to connect to"),
@@ -14,5 +15,5 @@ def start(
     server = CoAPServer(host, port)
     server.start()
 
-app(prog_name="coap-server")
 
+app(prog_name="coap-server")

@@ -6,8 +6,8 @@ class BaseResource:
     Base class for resources.
 
     This class should be inherited by all resources.
-    It provides the basic methods that should be implemented by the child classes.
-    """
+    It provides the basic methods, that should be implemented by the child classes.
+    """  # noqa: E501
 
     def get(self, request: CoapRequest) -> bytes:
         raise NotImplementedError("GET method not implemented.")

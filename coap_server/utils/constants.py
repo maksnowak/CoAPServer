@@ -26,7 +26,7 @@ class CoapRequest:
     CoAP request data class.
     """
 
-    method: Literal[CoAPMethod.GET, CoAPMethod.POST, CoAPMethod.PUT, CoAPMethod.DELETE]
+    method: Literal[CoAPMethod.GET, CoAPMethod.POST, CoAPMethod.PUT, CoAPMethod.DELETE]  # noqa: E501
     uri: str
     payload: bytes = field(repr=False)
 
