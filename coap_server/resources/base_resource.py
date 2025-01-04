@@ -1,4 +1,4 @@
-from coap_server.utils.parser import CoapRequest
+from coap_server.utils.constants import CoapRequest
 
 
 class BaseResource:
@@ -8,6 +8,7 @@ class BaseResource:
     This class should be inherited by all resources.
     It provides the basic methods that should be implemented by the child classes.
     """
+
     def get(self, request: CoapRequest) -> bytes:
         raise NotImplementedError("GET method not implemented.")
 
@@ -19,4 +20,3 @@ class BaseResource:
 
     def delete(self, request: CoapRequest) -> bytes:
         raise NotImplementedError("DELETE method not implemented.")
-

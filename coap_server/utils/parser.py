@@ -1,17 +1,4 @@
-from dataclasses import dataclass, field
-from typing import Literal
-
-from coap_server.utils.constants import CoAPMethod
-
-
-@dataclass(frozen=True)
-class CoapRequest:
-    """
-    CoAP request data class.
-    """
-    method: Literal[CoAPMethod.GET, CoAPMethod.POST, CoAPMethod.PUT, CoAPMethod.DELETE]
-    uri: str
-    payload: bytes = field(repr=False)
+from coap_server.utils.constants import CoapRequest
 
 
 def parse_request(data: bytes) -> CoapRequest:
@@ -25,4 +12,3 @@ def parse_request(data: bytes) -> CoapRequest:
     :rtype: CoapRequest
     """
     raise NotImplementedError("parse_request function not implemented.")
-

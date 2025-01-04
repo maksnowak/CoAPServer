@@ -1,5 +1,6 @@
 from coap_server.resources.base_resource import BaseResource
-from coap_server.utils.parser import CoapRequest
+from coap_server.utils.constants import CoapRequest
+
 
 class TemperatureSensorResource(BaseResource):
     def __init__(self):
@@ -16,4 +17,3 @@ class TemperatureSensorResource(BaseResource):
 
     def delete(self, request: CoapRequest):
         return b"2.02 Deleted"
-
