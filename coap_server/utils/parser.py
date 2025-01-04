@@ -1,4 +1,18 @@
-def parse_request(data: bytes) -> dict:
+from dataclasses import dataclass, field
+from typing import Literal
+
+
+@dataclass(frozen=True)
+class CoapRequest:
+    """
+    CoAP request data class.
+    """
+    method: Literal['GET', 'POST', 'PUT', 'DELETE']
+    uri: str
+    payload: bytes = field(repr=False)
+
+
+def parse_request(data: bytes) -> CoapRequest:
     """
     Parse the CoAP request data and return a dictionary.
 
@@ -6,7 +20,7 @@ def parse_request(data: bytes) -> dict:
     :type data: bytes
 
     :return: CoAP request data as a dictionary
-    :rtype: dict
+    :rtype: CoapRequest
     """
     raise NotImplementedError("parse_request function not implemented.")
 
