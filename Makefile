@@ -2,7 +2,7 @@
 TESTS=tests
 POETRY=$(shell command -v poetry 2> /dev/null)
 ENV_PREFIX=$(shell python -c "import pathlib; print('.venv/bin/' if pathlib.Path('.venv/bin/pip').exists() else '')")
-PROJECT_NAME=$(PROJECT_NAME)
+PROJECT_NAME=coap_server
 
 .DEFAULT_GOAL := help
 
