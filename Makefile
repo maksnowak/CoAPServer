@@ -25,12 +25,12 @@ install:          ## Install dependencies using Poetry.
 	$(POETRY) install
 
 .PHONY: fmt
-fmt:              ## Format code using isort & ruff.
+fmt: install       ## Format code using isort & ruff.
 	$(ENV_PREFIX)isort $(PROJECT_NAME)/
 	$(ENV_PREFIX)ruff format $(PROJECT_NAME)/
 
 .PHONY: lint
-lint:             ## Run linters: flake8, mypy, and ruff.
+lint: install     ## Run linters: flake8, mypy, and ruff.
 	$(ENV_PREFIX)flake8 $(PROJECT_NAME)/
 	$(ENV_PREFIX)mypy --ignore-missing-imports $(PROJECT_NAME)/
 	$(ENV_PREFIX)ruff check --fix $(PROJECT_NAME)/
@@ -46,7 +46,7 @@ clean:            ## Clean project by deleting files in .gitignore.
 	git clean -Xdf
 
 .PHONY: docs
-docs:             ## Build and open the documentation.
+docs: install      ## Build and open the documentation.
 	@echo "Building documentation ..."
 	$(ENV_PREFIX)mkdocs build
 	URL="site/index.html"; \
