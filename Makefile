@@ -35,6 +35,10 @@ lint:             ## Run linters: flake8, mypy, and ruff.
 	$(ENV_PREFIX)mypy --ignore-missing-imports $(PROJECT_NAME)/
 	$(ENV_PREFIX)ruff check --fix $(PROJECT_NAME)/
 
+.PHONY: run
+run:              ## Run the server.
+	$(ENV_PREFIX)python -m $(PROJECT_NAME)
+
 .PHONY: test
 test: lint        ## Run tests and generate coverage reports.
 	$(ENV_PREFIX)pytest -v --cov-config .coveragerc --cov=$(PROJECT_NAME) -l --tb=short --maxfail=1 $(TESTS)/
