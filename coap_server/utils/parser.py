@@ -1,13 +1,15 @@
 from dataclasses import dataclass, field
 from typing import Literal
 
+from coap_server.utils.constants import CoAPMethod
+
 
 @dataclass(frozen=True)
 class CoapRequest:
     """
     CoAP request data class.
     """
-    method: Literal['GET', 'POST', 'PUT', 'DELETE']
+    method: Literal[CoAPMethod.GET, CoAPMethod.POST, CoAPMethod.PUT, CoAPMethod.DELETE]
     uri: str
     payload: bytes = field(repr=False)
 

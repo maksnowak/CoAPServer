@@ -1,3 +1,4 @@
+from coap_server.utils.constants import CoAPCode
 from coap_server.utils.parser import parse_request
 from resources.temperature_sensor import TemperatureSensorResource
 
@@ -11,13 +12,12 @@ class RequestHandler:
         request = parse_request(data)
         resource = self.routes.get(request.uri)
         if not resource:
-            return b"4.04 Not Found"
+            return CoAPCode.NOT_FOUND.value
         
-        method = request.method.lower()
-        if not hasattr(resource, method): # Check if the method is implemented in the resource
-            return b"4.05 Method Not Allowed"
-        
-        print(f"Request: {repr(request)}")
-        handler = getattr(resource, method)
-        return handler(request)
+        print(f"Handling request: {repr(request)}")
+        try:
+            method = request.method.get_resource_method(resource)
+            return method(request)
+        except AttributeError:
+            return CoAPCode.METHOD_NOT_ALLOWED.value
 
