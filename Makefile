@@ -36,12 +36,7 @@ lint:             ## Run linters: flake8, mypy, and ruff.
 	$(ENV_PREFIX)ruff check --fix $(PROJECT_NAME)/
 
 .PHONY: run
-run:              ## Run the server.
-	@if [ -z "$(POETRY)" ]; then \
-		echo "Poetry could not be found. See https://python-poetry.org/docs/"; \
-		exit 2; \
-	fi
-	$(POETRY) install
+run: install      ## Run the project.
 	$(ENV_PREFIX)python -m $(PROJECT_NAME)
 
 .PHONY: test
