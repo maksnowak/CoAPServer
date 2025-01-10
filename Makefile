@@ -23,6 +23,7 @@ install:          ## Install dependencies using Poetry.
 		exit 2; \
 	fi
 	$(POETRY) install
+	$(ENV_PREFIX)pre-commit install
 
 .PHONY: fmt
 fmt: install       ## Format code using isort & ruff.
