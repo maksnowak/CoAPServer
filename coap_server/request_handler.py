@@ -15,7 +15,7 @@ class RequestHandler:
         if not resource:
             return CoapCode.NOT_FOUND.value.encode("ascii")
 
-        print(f"Handling request: {repr(request)}")
+        print(f"\nHandling request: {repr(request)}")
         try:
             method = self.get_resource_method(request, resource)
             response = method(request)

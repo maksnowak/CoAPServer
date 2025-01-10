@@ -11,7 +11,7 @@ class CoAPServer:
 
     def start(self):
         self.sock.bind((self.host, self.port))
-        print(f"CoAP Server started on {self.host}:{self.port}")
+        print(f"\nCoAP Server started on {self.host}:{self.port}")
         while True:
             data, addr = self.sock.recvfrom(1024)
             response = self.handler.handle_request(data)
