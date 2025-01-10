@@ -1,7 +1,7 @@
 .ONESHELL:
 TESTS=tests
 POETRY=$(shell command -v poetry 2> /dev/null)
-ENV_PREFIX=$(shell python -c "import pathlib; print('.venv/bin/' if pathlib.Path('.venv/bin/pip').exists() else '')")
+ENV_PREFIX=$(shell python3 -c "import pathlib; print('.venv/bin/' if pathlib.Path('.venv/bin/pip').exists() else '')")
 PROJECT_NAME=coap_server
 
 .DEFAULT_GOAL := help
@@ -37,6 +37,10 @@ lint: install     ## Run linters: flake8, mypy, and ruff.
 
 .PHONY: run
 run: install      ## Run the project.
+	@if [ -z "$(ENV_PREFIX)" ]; then
+		echo "Virtual environment not found."; \
+		exit 1; \
+	fi
 	$(ENV_PREFIX)python -m $(PROJECT_NAME)
 
 .PHONY: test
