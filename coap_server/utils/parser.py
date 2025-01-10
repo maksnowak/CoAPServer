@@ -74,7 +74,12 @@ def encode_message(message: CoapMessage) -> bytes:
     # Combine all parts of header
     data += bytes([first_byte, second_byte, mid_high, mid_low]) + message.token
 
-    # TODO options
+    # Options
+    for option, value in message.options.items():
+        option_delta = option.value
+        option_length = len(value)
+        data += bytes([option_delta << 4 | option_length])
+        data += value
 
     if message.payload:
         data += bytes([0xFF])

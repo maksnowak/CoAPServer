@@ -26,7 +26,7 @@ class RequestHandler:
     def get_resource_method(
         self, message: CoapMessage, resource: BaseResource
     ) -> Callable[[CoapMessage], CoapMessage]:
-        if message.header_code.value == CoapCode.GET:
+        if message.header_code == CoapCode.GET:
             return resource.get
 
         # TODO: other methods

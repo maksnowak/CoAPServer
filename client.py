@@ -1,7 +1,7 @@
 import socket
 
 from coap_server.utils.constants import CoapCode, CoapMessage, CoapOption
-from coap_server.utils.parser import encode_message
+from coap_server.utils.parser import parse_request, encode_message
 
 
 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
@@ -22,4 +22,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
 
     sock.sendto(encode_message(request), server_address)
 
-    sock.recv(2048)
+    data = sock.recv(1024)
+    print(data)
+    response = parse_request(data)
+    print(response)

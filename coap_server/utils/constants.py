@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 
 
@@ -78,7 +78,7 @@ class CoapMessage:
     header_mid: int
     token: bytes
     options: dict[CoapOption, bytes]
-    payload: bytes = field(repr=False)
+    payload: bytes
 
     @property
     def uri(self) -> str:
@@ -88,9 +88,7 @@ class CoapMessage:
 
         value = ""
         if CoapOption.URI_PATH in self.options:
-            value += "/" + "/".join(
-                self.options[CoapOption.URI_PATH].decode().split(",")
-            )
+            value += "/".join(self.options[CoapOption.URI_PATH].decode().split(","))
         if CoapOption.URI_QUERY in self.options:
             value += "?" + "&".join(
                 self.options[CoapOption.URI_QUERY].decode().split(",")
