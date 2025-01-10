@@ -1,7 +1,7 @@
 from typing import Callable
 from coap_server.resources.base_resource import BaseResource
-from coap_server.utils.constants import CoAPCode, CoapRequest
-from coap_server.utils.parser import parse_request
+from coap_server.utils.constants import CoapCode, CoapMessage
+from coap_server.utils.parser import encode_message, parse_request
 from coap_server.resources.temperature_sensor import TemperatureSensorResource
 
 
@@ -13,20 +13,24 @@ class RequestHandler:
         request = parse_request(data)
         resource = self.routes.get(request.uri)
         if not resource:
-            return CoAPCode.NOT_FOUND.value
+            return CoapCode.NOT_FOUND.value.encode("ascii")
 
         print(f"Handling request: {repr(request)}")
         try:
             method = self.get_resource_method(request, resource)
-            return method(request)
+            response = method(request)
+            return encode_message(response)
         except AttributeError:
-            return CoAPCode.METHOD_NOT_ALLOWED.value
+            return CoapCode.METHOD_NOT_ALLOWED.value.encode("ascii")
 
     def get_resource_method(
-        self, request: CoapRequest, resource: BaseResource
-    ) -> Callable[[CoapRequest], bytes]:
-        if not hasattr(resource, request.method.value.lower()):
-            raise AttributeError(
-                f"Method {request.method.value} not allowed for this resource."
-            )
-        return getattr(resource, request.method.value.lower())
+        self, message: CoapMessage, resource: BaseResource
+    ) -> Callable[[CoapMessage], CoapMessage]:
+        if message.header_code.value == CoapCode.GET:
+            return resource.get
+
+        # TODO: other methods
+
+        raise AttributeError(
+            f"Method {message.header_code} not allowed for this resource."
+        )

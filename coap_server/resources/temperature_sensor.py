@@ -1,19 +1,21 @@
 from coap_server.resources.base_resource import BaseResource
-from coap_server.utils.constants import CoapRequest
+from coap_server.utils.constants import CoapCode, CoapMessage
 
 
 class TemperatureSensorResource(BaseResource):
     def __init__(self):
-        self.sensors = {}  # {sensor_id: temperature}
+        self.sensors = {1: 22}  # {sensor_id: temperature}
 
-    def get(self, request: CoapRequest):
-        return b"2.05 Content: Current temperature is 22C"
+    def get(self, request: CoapMessage) -> CoapMessage:
+        response = CoapMessage(
+            header_version=request.header_version,
+            header_type=request.header_type,
+            header_token_length=request.header_token_length,
+            header_code=CoapCode.CONTENT,
+            header_mid=request.header_mid,
+            token=request.token,
+            options={},
+            payload=b"Current temperature is 22C",
+        )
 
-    def post(self, request: CoapRequest):
-        return b"2.01 Created"
-
-    def put(self, request: CoapRequest):
-        return b"2.04 Changed"
-
-    def delete(self, request: CoapRequest):
-        return b"2.02 Deleted"
+        return response
