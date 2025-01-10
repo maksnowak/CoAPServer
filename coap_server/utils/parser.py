@@ -1,4 +1,4 @@
-from coap_server.utils.constants import CoapRequest
+from coap_server.utils.constants import CoapRequest, CoapOption
 
 
 def parse_request(data: bytes) -> CoapRequest:
@@ -18,9 +18,41 @@ def parse_request(data: bytes) -> CoapRequest:
     header_code    = (data[1] >> 0) & 0x1F
     header_mid     = (data[2] << 8) | data[3]
     token          = data[4:4 + header_tkl]
-    options        = data[12:16]
-    if data[16] == 0xFF: # payload marker
-        payload = data[17:]
-    else:
-        payload = None
+    payload_marker = data.find(b"\xFF") # FIXME: 0xFF can be present in the option values
+    options        = data[4 + header_tkl:payload_marker]
+    payload        = data[payload_marker + 1:]
+
+    options: dict[CoapOption, bytes] = {}
+    option_code = 0
+    while options:
+        option_delta = (options[0] & 0xF0) >> 4
+        option_length = (options[0] & 0x0F)
+        options = options[1:]
+        option_value = options[:option_length]
+        options = options[option_length:]
+        option_code += option_delta
+        options[CoapOption(option_code)] = option_value
     
+    return CoapRequest(
+        method=header_code,
+        options=options,
+        uri=compose_uri(options),
+        payload=payload
+    )
+    
+def compose_uri(options: dict[CoapOption, bytes]) -> str:
+    """
+    Compose the URI from the options.
+
+    :param options: CoAP options
+    :type options: dict[CoapOption, bytes]
+
+    :return: URI
+    :rtype: str
+    """
+    uri = ""
+    if CoapOption.URI_PATH in options:
+        uri += "/" + "/".join(options[CoapOption.URI_PATH].decode().split(","))
+    if CoapOption.URI_QUERY in options:
+        uri += "?" + "&".join(options[CoapOption.URI_QUERY].decode().split(","))
+    return uri

@@ -19,6 +19,24 @@ class CoAPMethod(Enum):
         return CoAPMethod[method.upper()]
 
 
+# CoAP options
+class CoapOption(Enum):
+    IF_MATCH = 1
+    URI_HOST = 3
+    ETAG = 4
+    IF_NONE_MATCH = 5
+    URI_PORT = 7
+    LOCATION_PATH = 8
+    URI_PATH = 11
+    CONTENT_FORMAT = 12
+    MAX_AGE = 14
+    URI_QUERY = 15
+    ACCEPT = 17
+    LOCATION_QUERY = 20
+    PROXY_URI = 35
+    PROXY_SCHEME = 39
+    SIZE1 = 60
+
 # CoAP request
 @dataclass(frozen=True)
 class CoapRequest:
@@ -27,6 +45,7 @@ class CoapRequest:
     """
 
     method: Literal[CoAPMethod.GET, CoAPMethod.POST, CoAPMethod.PUT, CoAPMethod.DELETE]  # noqa: E501
+    options: dict[CoapOption, bytes]
     uri: str
     payload: bytes = field(repr=False)
 
