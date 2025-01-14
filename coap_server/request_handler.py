@@ -24,13 +24,13 @@ class RequestHandler:
             return CoapCode.METHOD_NOT_ALLOWED.value.encode("ascii")
 
     def get_resource_method(
-        self, message: CoapMessage, resource: BaseResource
+        self, request: CoapMessage, resource: BaseResource
     ) -> Callable[[CoapMessage], CoapMessage]:
-        if message.header_code == CoapCode.GET:
+        if request.header_code == CoapCode.GET:
             return resource.get
 
         # TODO: other methods
 
         raise AttributeError(
-            f"Method {message.header_code} not allowed for this resource."
+            f"Method {request.header_code} not allowed for this resource."
         )

@@ -9,7 +9,7 @@ class BaseResource:
     It provides the basic methods, that should be implemented by the child classes.
     """  # noqa: E501
 
-    def get(self, message: CoapMessage) -> CoapMessage:
+    def get(self, request: CoapMessage) -> CoapMessage:
         raise NotImplementedError("GET method not implemented.")
 
     def post(self, request: CoapMessage) -> CoapMessage:
