@@ -1,16 +1,17 @@
 from coap_server.utils.constants import CoapCode, CoapMessage, CoapOption
 
 
-def parse_request(data: bytes) -> CoapMessage:
+def parse_message(data: bytes) -> CoapMessage:
     """
-    Parse the CoAP request data and return a dictionary.
+    Parse the CoAP message data and return a CoapMessage.
 
     :param data: CoAP request data
     :type data: bytes
 
-    :return: CoAP request data as a dictionary
+    :return: CoAP request data
     :rtype: CoapRequest
     """
+
     header_version = (0xC0 & data[0]) >> 6
     header_type = (0x30 & data[0]) >> 4
     header_token_length = (0x0F & data[0]) >> 0

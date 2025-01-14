@@ -1,7 +1,7 @@
 from typing import Callable
 from coap_server.resources.base_resource import BaseResource
 from coap_server.utils.constants import CoapCode, CoapMessage
-from coap_server.utils.parser import encode_message, parse_request
+from coap_server.utils.parser import encode_message, parse_message
 from coap_server.resources.temperature_sensor import TemperatureSensorResource
 
 
@@ -10,7 +10,7 @@ class RequestHandler:
         self.routes = {"/temperature": TemperatureSensorResource()}
 
     def handle_request(self, data: bytes) -> bytes:
-        request = parse_request(data)
+        request = parse_message(data)
         resource = self.routes.get(request.uri)
         if not resource:
             return CoapCode.NOT_FOUND.value.encode("ascii")
