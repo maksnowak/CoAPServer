@@ -19,3 +19,31 @@ class TemperatureSensorResource(BaseResource):
         )
 
         return response
+
+    def delete(self, request: CoapMessage) -> CoapMessage:
+        sensor_id = int(request.uri.split("/")[-1])
+        if sensor_id not in self.sensors:
+            return CoapMessage(
+                header_version=request.header_version,
+                header_type=request.header_type,
+                header_token_length=request.header_token_length,
+                header_code=CoapCode.NOT_FOUND,
+                header_mid=request.header_mid,
+                token=request.token,
+                options={},
+                payload=b"Sensor not found",
+            )
+
+        self.sensors.pop(sensor_id, None)
+        response = CoapMessage(
+            header_version=request.header_version,
+            header_type=request.header_type,
+            header_token_length=request.header_token_length,
+            header_code=CoapCode.DELETED,
+            header_mid=request.header_mid,
+            token=request.token,
+            options={},
+            payload=b"Sensor deleted",
+        )
+
+        return response

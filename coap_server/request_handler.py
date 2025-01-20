@@ -29,6 +29,9 @@ class RequestHandler:
         if request.header_code == CoapCode.GET:
             return resource.get
 
+        if request.header_code == CoapCode.DELETE:
+            return resource.delete
+
         # TODO: other methods
 
         raise AttributeError(
