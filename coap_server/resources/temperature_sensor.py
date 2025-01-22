@@ -1,5 +1,5 @@
 from coap_server.resources.base_resource import BaseResource
-from coap_server.utils.constants import CoapCode, CoapMessage
+from coap_server.utils.constants import CoapCode, CoapMessage, CoapOption
 
 
 class TemperatureSensorResource(BaseResource):
@@ -21,8 +21,22 @@ class TemperatureSensorResource(BaseResource):
         return response
 
     def delete(self, request: CoapMessage) -> CoapMessage:
-        sensor_id = int(request.uri.split("/")[-1])
+        if CoapOption.URI_PATH not in request.options:
+            return CoapMessage(
+                header_version=request.header_version,
+                header_type=request.header_type,
+                header_token_length=request.header_token_length,
+                header_code=CoapCode.BAD_REQUEST,
+                header_mid=request.header_mid,
+                token=request.token,
+                options={},
+                payload=b"Incorrect URI path",
+            )
+        sensor_id = int(
+            request.options.get(CoapOption.URI_QUERY, b"id=0").decode().split("=")[1]
+        )
         if sensor_id not in self.sensors:
+            print("Sensor not found")
             return CoapMessage(
                 header_version=request.header_version,
                 header_type=request.header_type,

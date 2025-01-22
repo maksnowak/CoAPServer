@@ -13,7 +13,19 @@ class RequestHandler:
         request = parse_message(data)
         resource = self.routes.get(request.uri)
         if not resource:
-            return CoapCode.NOT_FOUND.value.encode("ascii")
+            print("Resource not found")
+            return encode_message(
+                CoapMessage(
+                    header_version=1,
+                    header_type=0,
+                    header_token_length=4,
+                    header_code=CoapCode.NOT_FOUND,
+                    header_mid=request.header_mid,
+                    token=request.token,
+                    options={},
+                    payload=b"",
+                )
+            )
 
         print(f"\nHandling request: {repr(request)}")
         try:
@@ -21,7 +33,18 @@ class RequestHandler:
             response = method(request)
             return encode_message(response)
         except AttributeError:
-            return CoapCode.METHOD_NOT_ALLOWED.value.encode("ascii")
+            return encode_message(
+                CoapMessage(
+                    header_version=1,
+                    header_type=0,
+                    header_token_length=4,
+                    header_code=CoapCode.METHOD_NOT_ALLOWED,
+                    header_mid=request.header_mid,
+                    token=request.token,
+                    options={},
+                    payload=b"",
+                )
+            )
 
     def get_resource_method(
         self, request: CoapMessage, resource: BaseResource
