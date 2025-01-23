@@ -1,5 +1,7 @@
 import socket
+import pytest
 from threading import Thread
+from concurrent.futures import ThreadPoolExecutor
 
 from coap_server.server import CoAPServer
 from coap_server.utils.constants import CoapMessage, CoapOption, CoapCode
@@ -35,16 +37,34 @@ def test_get():
     server_thread = Thread(target=server.start, daemon=True)
     server_thread.start()
 
-    response = client()
+    try:
+        response = client()
 
-    assert response.header_version == 1
-    assert response.header_type == 0
-    assert response.header_token_length == 4
-    assert response.header_code == CoapCode.CONTENT
-    assert response.header_mid == 1337
-    assert response.token == b"1234"
-    assert response.options == {}
-    assert response.payload == b"Temperature is 22C"
+        assert response.header_version == 1
+        assert response.header_type == 0
+        assert response.header_token_length == 4
+        assert response.header_code == CoapCode.CONTENT
+        assert response.header_mid == 1337
+        assert response.token == b"1234"
+        assert response.options == {}
+        assert response.payload == b"Temperature is 22C"
+    finally:
+        server.shutdown()
+        server_thread.join()
 
-    server.shutdown()
-    server_thread.join()
+
+@pytest.mark.parametrize("num_clients", [1, 2, 3, 5, 10])
+def test_multiple_requests(num_clients):
+    server = CoAPServer()
+    server_thread = Thread(target=server.start, daemon=True)
+    server_thread.start()
+
+    try:
+        with ThreadPoolExecutor(max_workers=num_clients) as executor:
+            responses = list(executor.map(lambda _: client(), range(num_clients)))
+
+        for response in responses:
+            assert response.payload == b"Temperature is 22C"
+    finally:
+        server.shutdown()
+        server_thread.join()
