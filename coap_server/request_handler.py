@@ -3,11 +3,15 @@ from coap_server.resources.base_resource import BaseResource
 from coap_server.utils.constants import CoapCode, CoapMessage
 from coap_server.utils.parser import encode_message, parse_message
 from coap_server.resources.temperature_sensor import TemperatureSensorResource
+from coap_server.resources.devices import DevicesResource
 
 
 class RequestHandler:
     def __init__(self):
-        self.routes = {"/temperature": TemperatureSensorResource()}
+        self.routes = {
+            "/temperature": TemperatureSensorResource(),
+            "/devices": DevicesResource(),
+        }
 
     def handle_request(self, data: bytes) -> bytes:
         request = parse_message(data)
@@ -58,6 +62,10 @@ class RequestHandler:
     ) -> Callable[[CoapMessage], CoapMessage]:
         if request.header_code == CoapCode.GET:
             return resource.get
+        elif request.header_code == CoapCode.POST:
+            return resource.post
+        elif request.header_code == CoapCode.PUT:
+            return resource.put
 
         if request.header_code == CoapCode.DELETE:
             return resource.delete

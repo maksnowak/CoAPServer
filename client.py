@@ -7,6 +7,19 @@ from coap_server.utils.parser import parse_message, encode_message
 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
     server_address = ("127.0.0.1", 5683)
 
+    # request = CoapMessage(
+    #     header_version=1,
+    #     header_type=0,
+    #     header_token_length=4,
+    #     header_code=CoapCode.POST,
+    #     header_mid=1337,
+    #     token=b"1234",
+    #     options={
+    #         CoapOption.URI_PATH: b"/devices",
+    #     },
+    #     payload=b'{"id":12,"name":"Test Device"}',
+    # )
+
     request = CoapMessage(
         header_version=1,
         header_type=0,
@@ -15,7 +28,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/temperature",
+            CoapOption.URI_PATH: b"/devices",
         },
         payload=b"",
     )
