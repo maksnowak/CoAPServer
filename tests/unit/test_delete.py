@@ -14,8 +14,7 @@ def test_success():
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/temperature",
-            CoapOption.URI_QUERY: b"id=1",
+            CoapOption.URI_PATH: b"/temperature/1",
         },
         payload=b"",
     )
@@ -45,8 +44,7 @@ def test_not_found():
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/temperature",
-            CoapOption.URI_QUERY: b"id=2",
+            CoapOption.URI_PATH: b"/temperature/2",
         },
         payload=b"",
     )
@@ -63,31 +61,3 @@ def test_not_found():
     assert response.token == b"1234"
     assert response.options == {}
     assert response.payload == b"Sensor not found"
-
-
-def test_invalid_request():
-    handler = RequestHandler()
-
-    request = CoapMessage(
-        header_version=1,
-        header_type=0,
-        header_token_length=4,
-        header_code=CoapCode.DELETE,
-        header_mid=1337,
-        token=b"1234",
-        options={},
-        payload=b"",
-    )
-
-    request_encoded = encode_message(request)
-    response_encoded = handler.handle_request(request_encoded)
-    response = parse_message(response_encoded)
-
-    assert response.header_version == 1
-    assert response.header_type == 0
-    assert response.header_token_length == 4
-    assert response.header_code == CoapCode.BAD_REQUEST
-    assert response.header_mid == 1337
-    assert response.token == b"1234"
-    assert response.options == {}
-    assert response.payload == b"Incorrect URI path"

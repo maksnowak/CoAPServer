@@ -11,7 +11,14 @@ class RequestHandler:
 
     def handle_request(self, data: bytes) -> bytes:
         request = parse_message(data)
-        resource = self.routes.get(request.uri)
+        uri = request.uri
+        resource = None
+
+        for route, res in self.routes.items():
+            if uri.startswith(route):
+                resource = res
+                break
+
         if not resource:
             print("Resource not found")
             return encode_message(

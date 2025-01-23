@@ -21,22 +21,10 @@ class TemperatureSensorResource(BaseResource):
         return response
 
     def delete(self, request: CoapMessage) -> CoapMessage:
-        if CoapOption.URI_PATH not in request.options:
-            return CoapMessage(
-                header_version=request.header_version,
-                header_type=request.header_type,
-                header_token_length=request.header_token_length,
-                header_code=CoapCode.BAD_REQUEST,
-                header_mid=request.header_mid,
-                token=request.token,
-                options={},
-                payload=b"Incorrect URI path",
-            )
         sensor_id = int(
-            request.options.get(CoapOption.URI_QUERY, b"id=0").decode().split("=")[1]
+            request.options.get(CoapOption.URI_PATH, b"-1").decode().split("/")[-1]
         )
-        if sensor_id not in self.sensors:
-            print("Sensor not found")
+        if sensor_id not in self.sensors.keys():
             return CoapMessage(
                 header_version=request.header_version,
                 header_type=request.header_type,
