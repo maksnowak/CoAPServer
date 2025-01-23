@@ -83,7 +83,7 @@ class DevicesResource(BaseResource):
                 raise ValueError
 
             device = json.loads(request.payload.decode())
-            # TODO verify received device data is valid
+            # TODO: verify received device data is valid
 
             self.devices[int(device_id)] = device
 
@@ -98,9 +98,7 @@ class DevicesResource(BaseResource):
                 payload=json.dumps(device).encode("ascii"),
             )
 
-        except ValueError:
-            # id doesn't exist or not int
-
+        except ValueError:  # id doesn't exist or not int
             response = CoapMessage(
                 header_version=request.header_version,
                 header_type=request.header_type,
