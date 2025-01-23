@@ -8,7 +8,7 @@ class TemperatureSensorResource(BaseResource):
 
     def get(self, request: CoapMessage) -> CoapMessage:
         sensor_id = int(
-            request.options.get(CoapOption.URI_PATH, b"-1").decode().split("/")[-1]
+            request.options.get(CoapOption.URI_PATH, b"-1").decode().rsplit("/", 1)[-1]
         )
         if sensor_id not in self.sensors.keys():
             return CoapMessage(
@@ -39,7 +39,7 @@ class TemperatureSensorResource(BaseResource):
 
     def delete(self, request: CoapMessage) -> CoapMessage:
         sensor_id = int(
-            request.options.get(CoapOption.URI_PATH, b"-1").decode().split("/")[-1]
+            request.options.get(CoapOption.URI_PATH, b"-1").decode().rsplit("/", 1)[-1]
         )
         if sensor_id not in self.sensors.keys():
             return CoapMessage(
