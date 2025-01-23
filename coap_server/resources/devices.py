@@ -26,7 +26,7 @@ class DevicesResource(BaseResource):
             device = json.loads(request.payload.decode())
             self.devices[device["id"]] = device["name"]
         except Exception:
-            response = CoapCode(
+            response = CoapMessage(
                 header_version=request.header_version,
                 header_type=request.header_type,
                 header_token_length=request.header_token_length,
@@ -36,6 +36,7 @@ class DevicesResource(BaseResource):
                 options={},
                 payload=b"",
             )
+
         response = CoapMessage(
             header_version=request.header_version,
             header_type=request.header_type,
