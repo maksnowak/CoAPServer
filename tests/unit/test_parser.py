@@ -17,19 +17,21 @@ def test_encode_message():
     )
 
     request_encoded = encode_message(request)
-    assert request_encoded == b""
+    assert request_encoded == b"D\x01\x0591234\xbe/temperature/1"
 
 
 def test_parse_message():
-    response_encoded = b""
+    response_encoded = b"D\x01\x0591234\xbe/temperature/1"
 
     response = parse_message(response_encoded)
 
     assert response.header_version == 1
     assert response.header_type == 0
     assert response.header_token_length == 4
-    assert response.header_code == CoapCode.NOT_FOUND
+    assert response.header_code == CoapCode.GET
     assert response.header_mid == 1337
     assert response.token == b"1234"
-    assert response.options == {}
-    assert response.payload == b"Resource not found"
+    assert response.options == {
+        CoapOption.URI_PATH: b"/temperature/1",
+    }
+    assert response.payload == b""
