@@ -3,8 +3,8 @@ from coap_server.utils.constants import CoapCode, CoapMessage, CoapOption
 from coap_server.utils.parser import parse_message, encode_message
 
 
-def test_success():
-    handler = RequestHandler()
+def test_success(routes):
+    handler = RequestHandler(routes)
 
     request = CoapMessage(
         header_version=1,
@@ -33,8 +33,8 @@ def test_success():
     assert response.payload == b"Sensor deleted"
 
 
-def test_not_found():
-    handler = RequestHandler()
+def test_not_found(routes):
+    handler = RequestHandler(routes)
 
     request = CoapMessage(
         header_version=1,

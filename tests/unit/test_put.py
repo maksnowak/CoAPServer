@@ -3,8 +3,8 @@ from coap_server.utils.constants import CoapCode, CoapMessage, CoapOption
 from coap_server.utils.parser import parse_message, encode_message
 
 
-def test_success():
-    handler = RequestHandler()
+def test_success(routes):
+    handler = RequestHandler(routes)
 
     request = CoapMessage(
         header_version=1,
@@ -60,8 +60,8 @@ def test_success():
     assert response.payload == b'{"name": "New name"}'
 
 
-def test_invalid_id_not_exists():
-    handler = RequestHandler()
+def test_invalid_id_not_exists(routes):
+    handler = RequestHandler(routes)
 
     request = CoapMessage(
         header_version=1,
@@ -90,8 +90,8 @@ def test_invalid_id_not_exists():
     assert response.payload == b'{"error": "Invalid resource id"}'
 
 
-def test_invalid_id_not_int():
-    handler = RequestHandler()
+def test_invalid_id_not_int(routes):
+    handler = RequestHandler(routes)
 
     request = CoapMessage(
         header_version=1,

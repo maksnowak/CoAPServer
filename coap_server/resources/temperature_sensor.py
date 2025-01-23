@@ -3,8 +3,12 @@ from coap_server.utils.constants import CoapCode, CoapMessage, CoapOption
 
 
 class TemperatureSensorResource(BaseResource):
-    def __init__(self):
-        self.sensors = {1: 22}  # {sensor_id: temperature}
+    def __init__(self, sensors: dict[int, int]):
+        # sensors = {
+        #     sensor_id: temperature,
+        #     ...
+        # }
+        self.sensors = sensors
 
     def get(self, request: CoapMessage) -> CoapMessage:
         sensor_id = int(
@@ -66,3 +70,6 @@ class TemperatureSensorResource(BaseResource):
         )
 
         return response
+
+    def __repr__(self) -> str:
+        return f"TemperatureSensorResource(sensors={self.sensors})"

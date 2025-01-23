@@ -5,8 +5,8 @@ from coap_server.utils.constants import CoapCode, CoapMessage, CoapOption
 from coap_server.utils.parser import parse_message, encode_message
 
 
-def test_success():
-    handler = RequestHandler()
+def test_success(routes):
+    handler = RequestHandler(routes)
 
     request = CoapMessage(
         header_version=1,
@@ -35,8 +35,8 @@ def test_success():
     assert response.payload == b"Temperature is 22C"
 
 
-def test_not_found():
-    handler = RequestHandler()
+def test_not_found(routes):
+    handler = RequestHandler(routes)
 
     request = CoapMessage(
         header_version=1,
@@ -65,17 +65,8 @@ def test_not_found():
     assert response.payload == b"Sensor not found"
 
 
-def test_devices_list():
-    devices = {
-        1: {
-            "name": "Device 1",
-        },
-        2: {
-            "name": "Device 2",
-        },
-    }
-
-    handler = RequestHandler()
+def test_devices_list(devices, routes):
+    handler = RequestHandler(routes)
 
     request = CoapMessage(
         header_version=1,
@@ -104,8 +95,8 @@ def test_devices_list():
     assert response.payload == json.dumps(devices).encode("ascii")
 
 
-def test_devices_retrieve():
-    handler = RequestHandler()
+def test_devices_retrieve(routes):
+    handler = RequestHandler(routes)
 
     request = CoapMessage(
         header_version=1,

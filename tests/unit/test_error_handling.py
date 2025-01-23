@@ -3,8 +3,8 @@ from coap_server.utils.constants import CoapCode, CoapMessage, CoapOption
 from coap_server.utils.parser import parse_message, encode_message
 
 
-def test_resource_not_found():
-    handler = RequestHandler()
+def test_resource_not_found(routes):
+    handler = RequestHandler(routes)
 
     request = CoapMessage(
         header_version=1,
@@ -33,8 +33,8 @@ def test_resource_not_found():
     assert response.payload == b"Resource not found"
 
 
-def test_method_not_allowed():
-    handler = RequestHandler()
+def test_method_not_allowed(routes):
+    handler = RequestHandler(routes)
 
     request = CoapMessage(
         header_version=1,

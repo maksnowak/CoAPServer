@@ -4,15 +4,14 @@ import json
 
 
 class DevicesResource(BaseResource):
-    def __init__(self):
-        self.devices = {
-            1: {
-                "name": "Device 1",
-            },
-            2: {
-                "name": "Device 2",
-            },
-        }
+    def __init__(self, devices: dict[int, dict[str, str]]):
+        # devices = {
+        #     device_id: {
+        #         "name": "Device 1",
+        #     },
+        #     ...
+        # }
+        self.devices = devices
 
     def get(self, request: CoapMessage) -> CoapMessage:
         uri = request.uri
@@ -142,3 +141,6 @@ class DevicesResource(BaseResource):
             )
 
         return response
+
+    def __repr__(self) -> str:
+        return f"DevicesResource(devices={self.devices})"

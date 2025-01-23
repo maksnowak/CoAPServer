@@ -3,8 +3,8 @@ from coap_server.utils.constants import CoapCode, CoapMessage, CoapOption
 from coap_server.utils.parser import parse_message, encode_message
 
 
-def test_success():
-    handler = RequestHandler()
+def test_success(routes):
+    handler = RequestHandler(routes)
 
     request = CoapMessage(
         header_version=1,
@@ -63,8 +63,8 @@ def test_success():
     )
 
 
-def test_failure_incorrect_uri():
-    handler = RequestHandler()
+def test_failure_incorrect_uri(routes):
+    handler = RequestHandler(routes)
 
     request = CoapMessage(
         header_version=1,
@@ -123,8 +123,8 @@ def test_failure_incorrect_uri():
     assert response.payload == b'{"1": {"name": "Device 1"}, "2": {"name": "Device 2"}}'
 
 
-def test_failure_invalid_json():
-    handler = RequestHandler()
+def test_failure_invalid_json(routes):
+    handler = RequestHandler(routes)
 
     request = CoapMessage(
         header_version=1,
