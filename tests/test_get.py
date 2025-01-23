@@ -54,7 +54,7 @@ def test_devices_list():
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/",
+            CoapOption.URI_PATH: b"/devices",
         },
         payload=b"",
     )
