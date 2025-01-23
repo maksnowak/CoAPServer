@@ -66,11 +66,8 @@ class RequestHandler:
             return resource.post
         elif request.header_code == CoapCode.PUT:
             return resource.put
-
-        if request.header_code == CoapCode.DELETE:
+        elif request.header_code == CoapCode.DELETE:
             return resource.delete
-
-        # TODO: other methods
 
         raise AttributeError(
             f"Method {request.header_code} not allowed for this resource."
