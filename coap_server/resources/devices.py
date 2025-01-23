@@ -15,16 +15,32 @@ class DevicesResource(BaseResource):
         }
 
     def get(self, request: CoapMessage) -> CoapMessage:
-        response = CoapMessage(
-            header_version=request.header_version,
-            header_type=request.header_type,
-            header_token_length=request.header_token_length,
-            header_code=CoapCode.CONTENT,
-            header_mid=request.header_mid,
-            token=request.token,
-            options={},
-            payload=str(self.devices).encode("ascii"),
-        )
+        uri = request.uri
+
+        if uri == "/devices/":
+            response = CoapMessage(
+                header_version=request.header_version,
+                header_type=request.header_type,
+                header_token_length=request.header_token_length,
+                header_code=CoapCode.CONTENT,
+                header_mid=request.header_mid,
+                token=request.token,
+                options={},
+                payload=json.dumps(self.devices).encode("ascii"),
+            )
+        else:
+            device_id = int(uri.rsplit("/", 1)[-1])
+
+            response = CoapMessage(
+                header_version=request.header_version,
+                header_type=request.header_type,
+                header_token_length=request.header_token_length,
+                header_code=CoapCode.CONTENT,
+                header_mid=request.header_mid,
+                token=request.token,
+                options={},
+                payload=json.dumps(self.devices[device_id]).encode("ascii"),
+            )
 
         return response
 
