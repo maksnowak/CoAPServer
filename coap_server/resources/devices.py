@@ -17,7 +17,7 @@ class DevicesResource(BaseResource):
     def get(self, request: CoapMessage) -> CoapMessage:
         uri = request.uri
 
-        if uri == "/devices/":
+        if uri == "/devices":
             response = CoapMessage(
                 header_version=request.header_version,
                 header_type=request.header_type,
@@ -46,8 +46,15 @@ class DevicesResource(BaseResource):
 
     def post(self, request: CoapMessage) -> CoapMessage:
         try:
+            uri = request.uri
+            if uri != "/devices":
+                raise ValueError
+
             device = json.loads(request.payload.decode())
-            self.devices[device["id"]] = device["name"]
+
+            ids = self.devices.keys()
+            new_id = max(ids) + 1 if ids else 1
+            self.devices[new_id] = device
 
             response = CoapMessage(
                 header_version=request.header_version,
@@ -57,10 +64,10 @@ class DevicesResource(BaseResource):
                 header_mid=request.header_mid,
                 token=request.token,
                 options={},
-                payload=f"Device {device['id']} created".encode("ascii"),
+                payload=b"Device created",
             )
 
-        except Exception:
+        except json.JSONDecodeError:
             response = CoapMessage(
                 header_version=request.header_version,
                 header_type=request.header_type,
@@ -69,7 +76,19 @@ class DevicesResource(BaseResource):
                 header_mid=request.header_mid,
                 token=request.token,
                 options={},
-                payload=b"",
+                payload=b'{"error": "Invalid device data"}',
+            )
+
+        except ValueError:
+            response = CoapMessage(
+                header_version=request.header_version,
+                header_type=request.header_type,
+                header_token_length=request.header_token_length,
+                header_code=CoapCode.METHOD_NOT_ALLOWED,
+                header_mid=request.header_mid,
+                token=request.token,
+                options={},
+                payload=b'{"error": "POST method is not allowed for a specific device"}',
             )
 
         return response
