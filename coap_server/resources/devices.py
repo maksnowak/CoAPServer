@@ -5,7 +5,14 @@ import json
 
 class DevicesResource(BaseResource):
     def __init__(self):
-        self.devices = {1: "Device 1", 2: "Device 2"}
+        self.devices = {
+            1: {
+                "name": "Device 1",
+            },
+            2: {
+                "name": "Device 2",
+            },
+        }
 
     def get(self, request: CoapMessage) -> CoapMessage:
         response = CoapMessage(
@@ -47,6 +54,42 @@ class DevicesResource(BaseResource):
                 token=request.token,
                 options={},
                 payload=b"",
+            )
+
+        return response
+
+    def put(self, request: CoapMessage) -> CoapMessage:
+        try:
+            uri = request.uri
+            device_id = int(uri.rsplit("/", 1)[-1])
+            # TODO verify device_id exists
+
+            device = json.loads(request.payload.decode())
+            # TODO verify received device data is valid
+
+            self.devices[int(device_id)] = device
+
+            response = CoapMessage(
+                header_version=request.header_version,
+                header_type=request.header_type,
+                header_token_length=request.header_token_length,
+                header_code=CoapCode.CHANGED,
+                header_mid=request.header_mid,
+                token=request.token,
+                options={},
+                payload=json.dumps(device).encode("ascii"),
+            )
+
+        except Exception as e:
+            response = CoapMessage(
+                header_version=request.header_version,
+                header_type=request.header_type,
+                header_token_length=request.header_token_length,
+                header_code=CoapCode.BAD_REQUEST,
+                header_mid=request.header_mid,
+                token=request.token,
+                options={},
+                payload=json.dumps({"error": str(e)}).encode("ascii"),
             )
 
         return response

@@ -15,7 +15,14 @@ class RequestHandler:
 
     def handle_request(self, data: bytes) -> bytes:
         request = parse_message(data)
-        resource = self.routes.get(request.uri)
+        uri = request.uri
+        resource = None
+
+        for route, res in self.routes.items():
+            if uri.startswith(route):
+                resource = res
+                break
+
         if not resource:
             return CoapCode.NOT_FOUND.value.encode("ascii")
 
@@ -32,8 +39,10 @@ class RequestHandler:
     ) -> Callable[[CoapMessage], CoapMessage]:
         if request.header_code == CoapCode.GET:
             return resource.get
-        if request.header_code == CoapCode.POST:
+        elif request.header_code == CoapCode.POST:
             return resource.post
+        elif request.header_code == CoapCode.PUT:
+            return resource.put
 
         # TODO: other methods
 
