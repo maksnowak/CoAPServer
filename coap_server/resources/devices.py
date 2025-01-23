@@ -78,7 +78,9 @@ class DevicesResource(BaseResource):
         try:
             uri = request.uri
             device_id = int(uri.rsplit("/", 1)[-1])
-            # TODO verify device_id exists
+
+            if device_id not in self.devices:
+                raise ValueError
 
             device = json.loads(request.payload.decode())
             # TODO verify received device data is valid
@@ -94,6 +96,20 @@ class DevicesResource(BaseResource):
                 token=request.token,
                 options={},
                 payload=json.dumps(device).encode("ascii"),
+            )
+
+        except ValueError:
+            # id doesn't exist or not int
+
+            response = CoapMessage(
+                header_version=request.header_version,
+                header_type=request.header_type,
+                header_token_length=request.header_token_length,
+                header_code=CoapCode.BAD_REQUEST,
+                header_mid=request.header_mid,
+                token=request.token,
+                options={},
+                payload=b'{"error": "Invalid resource id"}',
             )
 
         except Exception as e:
