@@ -11,9 +11,28 @@ class RequestHandler:
 
     def handle_request(self, data: bytes) -> bytes:
         request = parse_message(data)
-        resource = self.routes.get(request.uri)
+        uri = request.uri
+        resource = None
+
+        for route, res in self.routes.items():
+            if uri.startswith(route):
+                resource = res
+                break
+
         if not resource:
-            return CoapCode.NOT_FOUND.value.encode("ascii")
+            print("Resource not found")
+            return encode_message(
+                CoapMessage(
+                    header_version=1,
+                    header_type=0,
+                    header_token_length=4,
+                    header_code=CoapCode.NOT_FOUND,
+                    header_mid=request.header_mid,
+                    token=request.token,
+                    options={},
+                    payload=b"Resource not found",
+                )
+            )
 
         print(f"\nHandling request: {repr(request)}")
         try:
@@ -21,13 +40,27 @@ class RequestHandler:
             response = method(request)
             return encode_message(response)
         except AttributeError:
-            return CoapCode.METHOD_NOT_ALLOWED.value.encode("ascii")
+            return encode_message(
+                CoapMessage(
+                    header_version=1,
+                    header_type=0,
+                    header_token_length=4,
+                    header_code=CoapCode.METHOD_NOT_ALLOWED,
+                    header_mid=request.header_mid,
+                    token=request.token,
+                    options={},
+                    payload=b"Method not allowed for this resource",
+                )
+            )
 
     def get_resource_method(
         self, request: CoapMessage, resource: BaseResource
     ) -> Callable[[CoapMessage], CoapMessage]:
         if request.header_code == CoapCode.GET:
             return resource.get
+
+        if request.header_code == CoapCode.DELETE:
+            return resource.delete
 
         # TODO: other methods
 
