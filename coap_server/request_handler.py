@@ -30,7 +30,7 @@ class RequestHandler:
                     header_mid=request.header_mid,
                     token=request.token,
                     options={},
-                    payload=b"",
+                    payload=b"Resource not found",
                 )
             )
 
@@ -49,7 +49,7 @@ class RequestHandler:
                     header_mid=request.header_mid,
                     token=request.token,
                     options={},
-                    payload=b"",
+                    payload=b"Method not allowed for this resource",
                 )
             )
 
