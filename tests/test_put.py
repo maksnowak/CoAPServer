@@ -60,7 +60,7 @@ def test_success():
     assert response.payload == b'{"name": "New name"}'
 
 
-def test_invalid_id_not_int():
+def test_invalid_id_not_exists():
     handler = RequestHandler()
 
     request = CoapMessage(
@@ -71,7 +71,7 @@ def test_invalid_id_not_int():
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/abc",
+            CoapOption.URI_PATH: b"/devices/123",
         },
         payload=b'{"name": "New name"}',
     )
@@ -90,7 +90,7 @@ def test_invalid_id_not_int():
     assert response.payload == b'{"error": "Invalid resource id"}'
 
 
-def test_invalid_id_not_exists():
+def test_invalid_id_not_int():
     handler = RequestHandler()
 
     request = CoapMessage(
@@ -101,7 +101,7 @@ def test_invalid_id_not_exists():
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/123",
+            CoapOption.URI_PATH: b"/devices/abc",
         },
         payload=b'{"name": "New name"}',
     )
