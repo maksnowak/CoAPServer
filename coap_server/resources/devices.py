@@ -25,6 +25,18 @@ class DevicesResource(BaseResource):
         try:
             device = json.loads(request.payload.decode())
             self.devices[device["id"]] = device["name"]
+
+            response = CoapMessage(
+                header_version=request.header_version,
+                header_type=request.header_type,
+                header_token_length=request.header_token_length,
+                header_code=CoapCode.CREATED,
+                header_mid=request.header_mid,
+                token=request.token,
+                options={},
+                payload=f"Device {device['id']} created".encode("ascii"),
+            )
+
         except Exception:
             response = CoapMessage(
                 header_version=request.header_version,
@@ -36,16 +48,5 @@ class DevicesResource(BaseResource):
                 options={},
                 payload=b"",
             )
-
-        response = CoapMessage(
-            header_version=request.header_version,
-            header_type=request.header_type,
-            header_token_length=request.header_token_length,
-            header_code=CoapCode.CREATED,
-            header_mid=request.header_mid,
-            token=request.token,
-            options={},
-            payload=f"Device {device['id']} created".encode("ascii"),
-        )
 
         return response
