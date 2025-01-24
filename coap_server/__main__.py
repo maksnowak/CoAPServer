@@ -3,7 +3,7 @@ from typing import MutableMapping
 import typer
 
 from coap_server.resources.base_resource import BaseResource
-from coap_server.resources.devices import DevicesResource
+from coap_server.resources.sensors import SensorsResource
 from coap_server.server import CoAPServer
 
 app = typer.Typer()
@@ -19,14 +19,14 @@ def start(
     """
 
     routes: MutableMapping[str, BaseResource] = {
-        "/devices": DevicesResource(
+        "/sensors": SensorsResource(
             {
                 1: {
-                    "name": "Device 1",
+                    "name": "Sensor 1",
                     "temperature": 21,
                 },
                 2: {
-                    "name": "Device 2",
+                    "name": "Sensor 2",
                     "temperature": 25,
                 },
             }

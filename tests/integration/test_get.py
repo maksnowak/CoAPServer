@@ -5,7 +5,7 @@ from coap_server.utils.constants import CoapCode, CoapMessage, CoapOption
 from coap_server.utils.parser import encode_message, parse_message
 
 
-def test_list(devices, routes):
+def test_list(sensors, routes):
     handler = RequestHandler(routes)
 
     request = CoapMessage(
@@ -16,7 +16,7 @@ def test_list(devices, routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices",
+            CoapOption.URI_PATH: b"/sensors",
         },
         payload=b"",
     )
@@ -32,10 +32,10 @@ def test_list(devices, routes):
     assert response.header_mid == 1337
     assert response.token == b"1234"
     assert response.options == {}
-    assert response.payload == json.dumps(devices).encode("ascii")
+    assert response.payload == json.dumps(sensors).encode("ascii")
 
 
-def test_retrieve(devices, routes):
+def test_retrieve(sensors, routes):
     handler = RequestHandler(routes)
 
     request = CoapMessage(
@@ -46,7 +46,7 @@ def test_retrieve(devices, routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/1",
+            CoapOption.URI_PATH: b"/sensors/1",
         },
         payload=b"",
     )
@@ -62,7 +62,7 @@ def test_retrieve(devices, routes):
     assert response.header_mid == 1337
     assert response.token == b"1234"
     assert response.options == {}
-    assert response.payload == json.dumps(devices[1]).encode("ascii")
+    assert response.payload == json.dumps(sensors[1]).encode("ascii")
 
 
 def test_temperature(routes):
@@ -76,7 +76,7 @@ def test_temperature(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/1/temperature",
+            CoapOption.URI_PATH: b"/sensors/1/temperature",
         },
         payload=b"",
     )
@@ -106,7 +106,7 @@ def test_not_found_id(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/37",
+            CoapOption.URI_PATH: b"/sensors/37",
         },
         payload=b"",
     )
@@ -122,7 +122,7 @@ def test_not_found_id(routes):
     assert response.header_mid == 1337
     assert response.token == b"1234"
     assert response.options == {}
-    assert response.payload == b'{"error": "Not found: /devices/37"}'
+    assert response.payload == b'{"error": "Not found: /sensors/37"}'
 
 
 def test_not_found_resource(routes):

@@ -14,7 +14,7 @@ def test_success(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/1",
+            CoapOption.URI_PATH: b"/sensors/1",
         },
         payload=b"",
     )
@@ -41,7 +41,7 @@ def test_success(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/1",
+            CoapOption.URI_PATH: b"/sensors/1",
         },
         payload=b"",
     )
@@ -57,7 +57,7 @@ def test_success(routes):
     assert response.header_mid == 1337
     assert response.token == b"1234"
     assert response.options == {}
-    assert response.payload == b'{"error": "Not found: /devices/1"}'
+    assert response.payload == b'{"error": "Not found: /sensors/1"}'
 
 
 def test_not_existing(routes):
@@ -71,7 +71,7 @@ def test_not_existing(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/37",
+            CoapOption.URI_PATH: b"/sensors/37",
         },
         payload=b"",
     )
@@ -87,4 +87,4 @@ def test_not_existing(routes):
     assert response.header_mid == 1337
     assert response.token == b"1234"
     assert response.options == {}
-    assert response.payload == b'{"error": "Not found: /devices/37"}'
+    assert response.payload == b'{"error": "Not found: /sensors/37"}'

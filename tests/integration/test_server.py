@@ -4,7 +4,6 @@ from threading import Thread
 
 import pytest
 
-from coap_server.resources.devices import DevicesResource
 from coap_server.server import CoAPServer
 from coap_server.utils.constants import CoapCode, CoapMessage, CoapOption
 from coap_server.utils.parser import encode_message, parse_message
@@ -22,7 +21,7 @@ def client():
             header_mid=1337,
             token=b"1234",
             options={
-                CoapOption.URI_PATH: b"/devices/1/temperature",
+                CoapOption.URI_PATH: b"/sensors/1/temperature",
             },
             payload=b"",
         )

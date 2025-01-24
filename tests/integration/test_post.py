@@ -4,7 +4,7 @@ from coap_server.request_handler import RequestHandler
 from coap_server.utils.constants import CoapCode, CoapMessage, CoapOption
 from coap_server.utils.parser import encode_message, parse_message
 
-obj_encoded = json.dumps({"name": "New device", "temperature": 30}).encode(
+obj_encoded = json.dumps({"name": "New sensor", "temperature": 30}).encode(
     "ascii"
 )
 
@@ -20,7 +20,7 @@ def test_success(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices",
+            CoapOption.URI_PATH: b"/sensors",
         },
         payload=obj_encoded,
     )
@@ -47,7 +47,7 @@ def test_success(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/3",
+            CoapOption.URI_PATH: b"/sensors/3",
         },
         payload=b"",
     )
@@ -77,7 +77,7 @@ def test_invalid_uri_id(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/1",
+            CoapOption.URI_PATH: b"/sensors/1",
         },
         payload=obj_encoded,
     )
@@ -110,7 +110,7 @@ def test_invalid_uri_temperature(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/1/temperature",
+            CoapOption.URI_PATH: b"/sensors/1/temperature",
         },
         payload=obj_encoded,
     )
@@ -143,7 +143,7 @@ def test_invalid_json(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices",
+            CoapOption.URI_PATH: b"/sensors",
         },
         payload=b'{"name": "New name"',
     )
@@ -173,7 +173,7 @@ def test_missing_fields(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices",
+            CoapOption.URI_PATH: b"/sensors",
         },
         payload=b'{"name": "New name"}',
     )

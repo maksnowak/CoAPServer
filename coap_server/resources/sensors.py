@@ -11,13 +11,13 @@ from coap_server.utils.exceptions import (
 )
 
 
-class DevicesResource(BaseResource):
+class SensorsResource(BaseResource):
     """
-    CoAP resource representing devices with temperature sensors.
+    CoAP resource representing sensors which can measure temperature.
 
     objects = {
-       device_id: {
-           "name": "Device 1",
+       sensor_id: {
+           "name": "Sensor 1",
            "temperature": 21,
        },
        ...
@@ -30,7 +30,7 @@ class DevicesResource(BaseResource):
         self.objects = objects
 
     def validate_data(self, data: dict) -> bool:
-        """Validates the received device data."""
+        """Validates the received sensor data."""
 
         keys = {"name", "temperature"}
         return set(data.keys()) == keys and isinstance(
@@ -39,21 +39,21 @@ class DevicesResource(BaseResource):
 
     def get(self, request: CoapMessage) -> CoapMessage:
         match request.uri.strip("/").split("/"):
-            case ["devices"]:
+            case ["sensors"]:
                 response = construct_response(
                     request,
                     CoapCode.CONTENT,
                     json.dumps(self.objects).encode("ascii"),
                 )
 
-            case ["devices", device_id_str]:
+            case ["sensors", sensor_id_str]:
                 try:
-                    device_id = int(device_id_str)
+                    sensor_id = int(sensor_id_str)
                 except ValueError:
                     raise NotFoundError
 
                 try:
-                    obj = self.objects[device_id]
+                    obj = self.objects[sensor_id]
                 except KeyError:
                     raise NotFoundError
 
@@ -63,14 +63,14 @@ class DevicesResource(BaseResource):
                     json.dumps(obj).encode("ascii"),
                 )
 
-            case ["devices", device_id_str, "temperature"]:
+            case ["sensors", sensor_id_str, "temperature"]:
                 try:
-                    device_id = int(device_id_str)
+                    sensor_id = int(sensor_id_str)
                 except ValueError:
                     raise NotFoundError
 
                 try:
-                    obj = self.objects[device_id]
+                    obj = self.objects[sensor_id]
                 except KeyError:
                     raise NotFoundError
 
@@ -89,7 +89,7 @@ class DevicesResource(BaseResource):
 
     def post(self, request: CoapMessage) -> CoapMessage:
         match request.uri.strip("/").split("/"):
-            case ["devices"]:
+            case ["sensors"]:
                 try:
                     obj = json.loads(request.payload.decode())
                 except json.JSONDecodeError:
@@ -106,10 +106,10 @@ class DevicesResource(BaseResource):
                     request, CoapCode.CREATED, json.dumps(obj).encode("ascii")
                 )
 
-            case ["devices", device_id_str]:
+            case ["sensors", sensor_id_str]:
                 raise MethodNotAllowedError
 
-            case ["devices", device_id_str, "temperature"]:
+            case ["sensors", sensor_id_str, "temperature"]:
                 raise MethodNotAllowedError
 
             case _:
@@ -119,12 +119,12 @@ class DevicesResource(BaseResource):
 
     def put(self, request: CoapMessage) -> CoapMessage:
         match request.uri.strip("/").split("/"):
-            case ["devices"]:
+            case ["sensors"]:
                 raise MethodNotAllowedError
 
-            case ["devices", device_id_str]:
+            case ["sensors", sensor_id_str]:
                 try:
-                    device_id = int(device_id_str)
+                    sensor_id = int(sensor_id_str)
                 except ValueError:
                     raise NotFoundError
 
@@ -136,25 +136,25 @@ class DevicesResource(BaseResource):
                 if not self.validate_data(obj):
                     raise BadRequestError
 
-                if device_id not in self.objects.keys():
+                if sensor_id not in self.objects.keys():
                     raise NotFoundError
 
-                self.objects[device_id] = obj
+                self.objects[sensor_id] = obj
 
                 response = construct_response(
                     request, CoapCode.CHANGED, json.dumps(obj).encode("ascii")
                 )
 
-            case ["devices", device_id, "temperature"]:
-                device_id = int(device_id)
+            case ["sensors", sensor_id, "temperature"]:
+                sensor_id = int(sensor_id)
                 value = int(request.payload.decode())
 
-                self.objects[device_id]["temperature"] = value
+                self.objects[sensor_id]["temperature"] = value
 
                 response = construct_response(
                     request,
                     CoapCode.CHANGED,
-                    json.dumps(self.objects[device_id]).encode("ascii"),
+                    json.dumps(self.objects[sensor_id]).encode("ascii"),
                 )
 
             case _:
@@ -164,23 +164,23 @@ class DevicesResource(BaseResource):
 
     def delete(self, request: CoapMessage) -> CoapMessage:
         match request.uri.strip("/").split("/"):
-            case ["devices"]:
+            case ["sensors"]:
                 raise MethodNotAllowedError
 
-            case ["devices", device_id_str]:
+            case ["sensors", sensor_id_str]:
                 try:
-                    device_id = int(device_id_str)
+                    sensor_id = int(sensor_id_str)
                 except ValueError:
                     raise NotFoundError
 
-                if device_id not in self.objects:
+                if sensor_id not in self.objects:
                     raise NotFoundError
 
-                self.objects.pop(device_id)
+                self.objects.pop(sensor_id)
 
                 response = construct_response(request, CoapCode.DELETED, b"")
 
-            case ["devices", device_id, "temperature"]:
+            case ["sensors", sensor_id, "temperature"]:
                 raise MethodNotAllowedError
 
             case _:

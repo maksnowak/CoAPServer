@@ -20,7 +20,7 @@ def test_success(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/1",
+            CoapOption.URI_PATH: b"/sensors/1",
         },
         payload=obj_encoded,
     )
@@ -47,7 +47,7 @@ def test_success(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/1",
+            CoapOption.URI_PATH: b"/sensors/1",
         },
         payload=b"",
     )
@@ -77,7 +77,7 @@ def test_invalid_id_not_exists(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/123",
+            CoapOption.URI_PATH: b"/sensors/123",
         },
         payload=obj_encoded,
     )
@@ -93,7 +93,7 @@ def test_invalid_id_not_exists(routes):
     assert response.header_mid == 1337
     assert response.token == b"1234"
     assert response.options == {}
-    assert response.payload == b'{"error": "Not found: /devices/123"}'
+    assert response.payload == b'{"error": "Not found: /sensors/123"}'
 
 
 def test_invalid_id_not_int(routes):
@@ -107,7 +107,7 @@ def test_invalid_id_not_int(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/abc",
+            CoapOption.URI_PATH: b"/sensors/abc",
         },
         payload=b'{"name": "New name"}',
     )
@@ -123,7 +123,7 @@ def test_invalid_id_not_int(routes):
     assert response.header_mid == 1337
     assert response.token == b"1234"
     assert response.options == {}
-    assert response.payload == b'{"error": "Not found: /devices/abc"}'
+    assert response.payload == b'{"error": "Not found: /sensors/abc"}'
 
 
 def test_invalid_json(routes):
@@ -137,7 +137,7 @@ def test_invalid_json(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/1",
+            CoapOption.URI_PATH: b"/sensors/1",
         },
         payload=b'{"name": "New name"',
     )
@@ -167,7 +167,7 @@ def test_missing_fields(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices/1",
+            CoapOption.URI_PATH: b"/sensors/1",
         },
         payload=b'{"name": "New name"}',
     )
