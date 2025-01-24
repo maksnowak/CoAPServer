@@ -41,7 +41,7 @@ run: install      ## Run the project.
 		echo "Virtual environment not found."; \
 		exit 1; \
 	fi
-	$(ENV_PREFIX)python -m $(PROJECT_NAME)
+	$(ENV_PREFIX)python -m $(PROJECT_NAME) $(ARGS)
 
 .PHONY: test
 test: lint        ## Run tests and generate coverage reports.

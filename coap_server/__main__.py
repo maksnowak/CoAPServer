@@ -15,12 +15,20 @@ app = typer.Typer()
 def start(
     host: str = typer.Option("127.0.0.1", help="The host to connect to"),
     port: int = typer.Option(5683, help="The port to connect to"),
+    verbose: int = typer.Option(
+        2,
+        "--verbose",
+        "-v",
+        count=True,
+        help="Increase verbosity level (-v = warning, -vv = info, -vvv = debug)",
+    ),
 ):
     """
-    CLI for CoAP server.
+    CoAP Server CLI.
     """
 
-    log_level = logging.DEBUG
+    log_levels = [logging.WARNING, logging.INFO, logging.DEBUG]
+    log_level = log_levels[min(verbose, len(log_levels) - 1)]
     logger.setLevel(log_level)
     logger.info(f"Starting CoAP Server on {host}:{port}")
 
