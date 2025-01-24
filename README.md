@@ -2,6 +2,8 @@
 
 *Autorzy: Michał Machnikowski, Maksymilian Nowak, Bruno Sienkiewicz*
 
+<a href="docs/dokumentacja_koncowa.pdf">Dokumentacja końcowa</a>
+
 ## Treść zadania
 
 Celem projektu jest implementacja serwera CoAP, który będzie obsługiwał przynajmniej żądania `GET`, `POST`, `PUT`, oraz `DELETE`.
