@@ -57,11 +57,3 @@ docker:           ## Build the Docker image.
 .PHONY: clean
 clean:            ## Clean project by deleting files in .gitignore.
 	git clean -Xdf
-
-.PHONY: docs
-docs: install      ## Build and open the documentation.
-	@echo "Building documentation ..."
-	$(ENV_PREFIX)mkdocs build
-	URL="site/index.html"; \
-	xdg-open $$URL || sensible-browser $$URL || x-www-browser $$URL || gnome-open $$URL || open $$URL
-
