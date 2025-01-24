@@ -3,6 +3,8 @@ import pytest
 from threading import Thread
 from concurrent.futures import ThreadPoolExecutor
 
+from coap_server.resources.devices import DevicesResource
+from coap_server.resources.temperature_sensor import TemperatureSensorResource
 from coap_server.server import CoAPServer
 from coap_server.utils.constants import CoapMessage, CoapOption, CoapCode
 from coap_server.utils.parser import encode_message, parse_message
@@ -33,7 +35,19 @@ def client():
 
 
 def test_get():
-    server = CoAPServer()
+    routes = {
+        "/devices": DevicesResource(
+            {
+                1: {"name": "Device 1"},
+            }
+        ),
+        "/temperature": TemperatureSensorResource(
+            {
+                1: 22,
+            }
+        ),
+    }
+    server = CoAPServer(routes)
     server_thread = Thread(target=server.start, daemon=True)
     server_thread.start()
 
@@ -47,7 +61,7 @@ def test_get():
         assert response.header_mid == 1337
         assert response.token == b"1234"
         assert response.options == {}
-        assert response.payload == b"Temperature is 25C"
+        assert response.payload == b"Temperature is 22C"
     finally:
         server.shutdown()
         server_thread.join()
@@ -55,7 +69,19 @@ def test_get():
 
 @pytest.mark.parametrize("num_clients", [1, 2, 3, 5, 10])
 def test_multiple_requests(num_clients):
-    server = CoAPServer()
+    routes = {
+        "/devices": DevicesResource(
+            {
+                1: {"name": "Device 1"},
+            }
+        ),
+        "/temperature": TemperatureSensorResource(
+            {
+                1: 22,
+            }
+        ),
+    }
+    server = CoAPServer(routes)
     server_thread = Thread(target=server.start, daemon=True)
     server_thread.start()
 
@@ -64,7 +90,7 @@ def test_multiple_requests(num_clients):
             responses = list(executor.map(lambda _: client(), range(num_clients)))
 
         for response in responses:
-            assert response.payload == b"Temperature is 25C"
+            assert response.payload == b"Temperature is 22C"
     finally:
         server.shutdown()
         server_thread.join()

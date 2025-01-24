@@ -1,3 +1,5 @@
+from coap_server.resources.devices import DevicesResource
+from coap_server.resources.temperature_sensor import TemperatureSensorResource
 from coap_server.server import CoAPServer
 import typer
 
@@ -12,7 +14,20 @@ def start(
     """
     CLI for CoAP server.
     """
-    server = CoAPServer(host, port)
+
+    routes = {
+        "/devices": DevicesResource(
+            {
+                1: {"name": "Device 1"},
+            }
+        ),
+        "/temperature": TemperatureSensorResource(
+            {
+                1: 22,
+            }
+        ),
+    }
+    server = CoAPServer(routes, host, port)
     server.start()
 
 
