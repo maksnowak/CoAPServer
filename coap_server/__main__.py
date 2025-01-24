@@ -1,7 +1,9 @@
+import logging
 from typing import MutableMapping
 
 import typer
 
+from coap_server.logger import logger
 from coap_server.resources.base_resource import BaseResource
 from coap_server.resources.sensors import SensorsResource
 from coap_server.server import CoAPServer
@@ -18,20 +20,19 @@ def start(
     CLI for CoAP server.
     """
 
+    log_level = logging.DEBUG
+    logger.setLevel(log_level)
+    logger.info(f"Starting CoAP Server on {host}:{port}")
+
     routes: MutableMapping[str, BaseResource] = {
         "/sensors": SensorsResource(
             {
-                1: {
-                    "name": "Sensor 1",
-                    "temperature": 21,
-                },
-                2: {
-                    "name": "Sensor 2",
-                    "temperature": 25,
-                },
+                1: {"name": "Sensor 1", "temperature": 21},
+                2: {"name": "Sensor 2", "temperature": 25},
             }
         ),
     }
+
     server = CoAPServer(routes, host, port)
     server.start()
 

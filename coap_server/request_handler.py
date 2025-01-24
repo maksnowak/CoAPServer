@@ -1,6 +1,7 @@
 import json
 from typing import Callable, MutableMapping
 
+from coap_server.logger import logger
 from coap_server.resources.base_resource import BaseResource
 from coap_server.utils.constants import CoapCode, CoapMessage
 from coap_server.utils.construct_response import construct_response
@@ -13,16 +14,21 @@ from coap_server.utils.parser import encode_message, parse_message
 
 
 class RequestHandler:
+    """
+    Handles incoming CoAP requests by routing them to the appropriate resource.
+
+    routes = {
+        "/name": Resource(),
+        ...
+    }
+    """
+
     def __init__(self, routes: MutableMapping[str, BaseResource]):
-        # routes = {
-        #     "/name": Resource(),
-        #     ...
-        # }
         self.routes = routes
 
     def handle_request(self, data: bytes) -> bytes:
         request = parse_message(data)
-        print(f"\nHandling request: {repr(request)}")
+        logger.debug(f"Handling request: {repr(request)}")
 
         try:
             for route, res in self.routes.items():
@@ -34,8 +40,10 @@ class RequestHandler:
 
             method = self.get_resource_method(request, resource)
             response = method(request)
+            logger.info(f"Request to {request.uri} handled successfully")
 
         except MethodNotAllowedError:
+            logger.warning(f"Method not allowed for {request.uri}")
             response = construct_response(
                 request,
                 CoapCode.METHOD_NOT_ALLOWED,
@@ -45,6 +53,7 @@ class RequestHandler:
             )
 
         except NotFoundError:
+            logger.warning(f"Resource not found: {request.uri}")
             response = construct_response(
                 request,
                 CoapCode.NOT_FOUND,
@@ -54,6 +63,7 @@ class RequestHandler:
             )
 
         except BadRequestError:
+            logger.error(f"Bad request: {request.uri}")
             response = construct_response(
                 request,
                 CoapCode.BAD_REQUEST,
@@ -61,6 +71,7 @@ class RequestHandler:
             )
 
         except Exception as e:
+            logger.critical(f"Unexpected error: {repr(e)}")
             response = construct_response(
                 request,
                 CoapCode.BAD_REQUEST,
