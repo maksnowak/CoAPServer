@@ -20,27 +20,43 @@ def parse_message(data: bytes) -> CoapMessage:
     header_code_decoded = f"{header_class}.{header_code:02}"
     header_mid = (data[2] << 8) | data[3]
     token = data[4 : 4 + header_token_length]
-    payload_marker = data.find(
-        b"\xff"
-    )  # FIXME: 0xFF can be present in the option values
-    if payload_marker != -1:
-        options = data[
-            4 + header_token_length : payload_marker
-        ]  # TODO: extended options
-    else:
-        options = data[4 + header_token_length :]
-    payload = data[payload_marker + 1 :]
-
+    options = data[4 + header_token_length :]
     options_parsed: dict[CoapOption, bytes] = {}
     option_code = 0
-    while options:
-        option_delta = (options[0] & 0xF0) >> 4
-        option_length = options[0] & 0x0F
+    payload = b""
+    while options and options[0] != 0xFF:
+        delta, length = (options[0] & 0xF0) >> 4, options[0] & 0x0F
         options = options[1:]
-        option_value = options[:option_length]
-        options = options[option_length:]
-        option_code += option_delta
-        options_parsed[CoapOption(option_code)] = option_value
+
+        # Handle extended option delta
+        if delta == 13:
+            delta = options[0] + 13
+            options = options[1:]
+        elif delta == 14:
+            delta = (options[0] << 8) + options[1] + 269
+            options = options[2:]
+        elif delta == 15:
+            raise ValueError("Invalid option delta: 15 is reserved for payload marker")
+
+        # Handle extended option length
+        if length == 13:
+            length = options[0] + 13
+            options = options[1:]
+        elif length == 14:
+            length = (options[0] << 8) + options[1] + 269
+            options = options[2:]
+        elif length == 15:
+            raise ValueError("Invalid option length: 15 is reserved")
+
+        option_code += delta
+        options_parsed[CoapOption(option_code)] = options[:length]
+        options = options[length:]
+
+    if options:
+        if options[0] == 0xFF:
+            payload = options[1:]
+        else:
+            raise ValueError("Invalid message: missing payload marker")
 
     return CoapMessage(
         header_version=header_version,
@@ -76,11 +92,37 @@ def encode_message(message: CoapMessage) -> bytes:
     data += bytes([first_byte, second_byte, mid_high, mid_low]) + message.token
 
     # Options
-    for option, value in message.options.items():
-        option_delta = option.value
+    prev_option = 0
+    for option, value in sorted(message.options.items()):
+        option_delta = option.value - prev_option
         option_length = len(value)
-        data += bytes([option_delta << 4 | option_length])
+
+        # Handle extended option delta
+        if option_delta >= 269:
+            data += bytes([14 << 4 | (option_length if option_length < 13 else 13)])
+            delta_ext = option_delta - 269
+            data += bytes([delta_ext >> 8, delta_ext & 0xFF])
+        elif option_delta >= 13:
+            data += bytes([13 << 4 | (option_length if option_length < 13 else 13)])
+            data += bytes([option_delta - 13])
+        else:
+            data += bytes(
+                [option_delta << 4 | (option_length if option_length < 13 else 13)]
+            )
+
+        # Handle extended option length
+        if option_length >= 269:
+            if option_delta < 13:
+                data = data[:-1] + bytes([option_delta << 4 | 14])
+            length_ext = option_length - 269
+            data += bytes([length_ext >> 8, length_ext & 0xFF])
+        elif option_length >= 13:
+            if option_delta < 13:
+                data = data[:-1] + bytes([option_delta << 4 | 13])
+            data += bytes([option_length - 13])
+
         data += value
+        prev_option = option.value
 
     if message.payload:
         data += bytes([0xFF])
