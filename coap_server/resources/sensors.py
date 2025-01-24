@@ -1,6 +1,7 @@
 import json
 from typing import MutableMapping
 
+from coap_server.logger import logger
 from coap_server.resources.base_resource import BaseResource
 from coap_server.utils.constants import CoapCode, CoapMessage
 from coap_server.utils.construct_response import construct_response
@@ -33,13 +34,21 @@ class SensorsResource(BaseResource):
         """Validates the received sensor data."""
 
         keys = {"name", "temperature"}
-        return set(data.keys()) == keys and isinstance(
+        valid = set(data.keys()) == keys and isinstance(
             data["temperature"], int
         )
 
+        if not valid:
+            logger.warning(f"Validation failed for data: {data}")
+
+        return valid
+
     def get(self, request: CoapMessage) -> CoapMessage:
+        logger.info(f"Received GET request for URI: {request.uri}")
+
         match request.uri.strip("/").split("/"):
             case ["sensors"]:
+                logger.debug("Returning all sensor data")
                 response = construct_response(
                     request,
                     CoapCode.CONTENT,
@@ -50,7 +59,9 @@ class SensorsResource(BaseResource):
                 try:
                     sensor_id = int(sensor_id_str)
                     obj = self.objects[sensor_id]
+                    logger.debug(f"Returning data for sensor {sensor_id}")
                 except (ValueError, KeyError):
+                    logger.error(f"Sensor {sensor_id_str} not found")
                     raise NotFoundError
 
                 response = construct_response(
@@ -62,15 +73,14 @@ class SensorsResource(BaseResource):
             case ["sensors", sensor_id_str, "temperature"]:
                 try:
                     sensor_id = int(sensor_id_str)
-                except ValueError:
-                    raise NotFoundError
-
-                try:
                     obj = self.objects[sensor_id]
-                except KeyError:
+                    value = obj["temperature"]
+                    logger.debug(
+                        f"Returning temperature for sensor {sensor_id}: {value}"
+                    )
+                except (ValueError, KeyError):
+                    logger.error(f"Sensor {sensor_id_str} not found")
                     raise NotFoundError
-
-                value = obj["temperature"]
 
                 response = construct_response(
                     request,
@@ -79,24 +89,30 @@ class SensorsResource(BaseResource):
                 )
 
             case _:
+                logger.error(f"Invalid GET request path: {request.uri}")
                 raise NotFoundError
 
         return response
 
     def post(self, request: CoapMessage) -> CoapMessage:
+        logger.info(f"Received POST request for URI: {request.uri}")
+
         match request.uri.strip("/").split("/"):
             case ["sensors"]:
                 try:
                     obj = json.loads(request.payload.decode())
+                    logger.debug("Parsed request payload successfully")
                 except json.JSONDecodeError:
+                    logger.error("Invalid JSON in request payload")
                     raise BadRequestError
 
                 if not self.validate_data(obj):
                     raise BadRequestError
 
-                ids = self.objects.keys()
-                new_id = max(ids) + 1 if ids else 1
+                new_id = max(self.objects.keys(), default=0) + 1
                 self.objects[new_id] = obj
+
+                logger.debug(f"Created new sensor {new_id}: {obj}")
 
                 response = construct_response(
                     request, CoapCode.CREATED, json.dumps(obj).encode("ascii")
@@ -109,41 +125,62 @@ class SensorsResource(BaseResource):
                 raise MethodNotAllowedError
 
             case _:
+                logger.error(f"Invalid POST request path: {request.uri}")
                 raise NotFoundError
 
         return response
 
     def put(self, request: CoapMessage) -> CoapMessage:
-        match request.uri.strip("/").split("/"):
-            case ["sensors"]:
-                raise MethodNotAllowedError
+        logger.info(f"Received PUT request for URI: {request.uri}")
 
+        match request.uri.strip("/").split("/"):
             case ["sensors", sensor_id_str]:
                 try:
                     sensor_id = int(sensor_id_str)
                     obj = json.loads(request.payload.decode())
+                    logger.debug(
+                        f"Updating sensor {sensor_id} with data: {obj}"
+                    )
                 except json.JSONDecodeError:
+                    logger.error("Invalid JSON in request payload")
                     raise BadRequestError
                 except ValueError:
+                    logger.error(f"Invalid sensor ID: {sensor_id_str}")
                     raise NotFoundError
 
                 if not self.validate_data(obj):
                     raise BadRequestError
 
-                if sensor_id not in self.objects.keys():
+                if sensor_id not in self.objects:
+                    logger.error(f"Sensor {sensor_id} not found for update")
                     raise NotFoundError
 
                 self.objects[sensor_id] = obj
+                logger.debug(f"Updated sensor {sensor_id}")
 
                 response = construct_response(
                     request, CoapCode.CHANGED, json.dumps(obj).encode("ascii")
                 )
 
-            case ["sensors", sensor_id, "temperature"]:
-                sensor_id = int(sensor_id)
-                value = int(request.payload.decode())
+            case ["sensors", sensor_id_str, "temperature"]:
+                try:
+                    sensor_id = int(sensor_id_str)
+                    new_temp = int(request.payload.decode())
+                    logger.debug(
+                        f"Updating temperature for sensor {sensor_id} to {new_temp}"
+                    )
+                except ValueError:
+                    logger.error("Invalid temperature update format")
+                    raise BadRequestError
 
-                self.objects[sensor_id]["temperature"] = value
+                if sensor_id not in self.objects:
+                    logger.error(f"Sensor {sensor_id} not found")
+                    raise NotFoundError
+
+                self.objects[sensor_id]["temperature"] = new_temp
+                logger.debug(
+                    f"Updated temperature for sensor {sensor_id}: {new_temp}"
+                )
 
                 response = construct_response(
                     request,
@@ -152,25 +189,28 @@ class SensorsResource(BaseResource):
                 )
 
             case _:
+                logger.error(f"Invalid PUT request path: {request.uri}")
                 raise NotFoundError
 
         return response
 
     def delete(self, request: CoapMessage) -> CoapMessage:
-        match request.uri.strip("/").split("/"):
-            case ["sensors"]:
-                raise MethodNotAllowedError
+        logger.info(f"Received DELETE request for URI: {request.uri}")
 
+        match request.uri.strip("/").split("/"):
             case ["sensors", sensor_id_str]:
                 try:
                     sensor_id = int(sensor_id_str)
                 except ValueError:
+                    logger.error(f"Invalid sensor ID format: {sensor_id_str}")
                     raise NotFoundError
 
                 if sensor_id not in self.objects:
+                    logger.error(f"Sensor {sensor_id} not found for deletion")
                     raise NotFoundError
 
                 self.objects.pop(sensor_id)
+                logger.debug(f"Deleted sensor {sensor_id}")
 
                 response = construct_response(request, CoapCode.DELETED, b"")
 
@@ -178,6 +218,7 @@ class SensorsResource(BaseResource):
                 raise MethodNotAllowedError
 
             case _:
+                logger.error(f"Invalid DELETE request path: {request.uri}")
                 raise NotFoundError
 
         return response
