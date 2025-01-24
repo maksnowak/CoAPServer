@@ -54,7 +54,7 @@ def test_get(routes):
         server_thread.join()
 
 
-@pytest.mark.parametrize("num_clients", [1, 2, 3, 5, 10])
+@pytest.mark.parametrize("num_clients", [3, 5, 10, 15])
 def test_multiple_requests(routes, num_clients):
     server = CoAPServer(routes)
     server_thread = Thread(target=server.start, daemon=True)
