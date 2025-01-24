@@ -7,7 +7,7 @@ class BaseResource:
 
     This class should be inherited by all resources.
     It provides the basic methods, that should be implemented by the child classes.
-    """  # noqa: E501
+    """
 
     objects: dict
 

@@ -36,7 +36,9 @@ def parse_message(data: bytes) -> CoapMessage:
             delta = (options[0] << 8) + options[1] + 269
             options = options[2:]
         elif delta == 15:
-            raise ValueError("Invalid option delta: 15 is reserved for payload marker")
+            raise ValueError(
+                "Invalid option delta: 15 is reserved for payload marker"
+            )
 
         # Handle extended option length
         if length == 13:
@@ -99,15 +101,22 @@ def encode_message(message: CoapMessage) -> bytes:
 
         # Handle extended option delta
         if option_delta >= 269:
-            data += bytes([14 << 4 | (option_length if option_length < 13 else 13)])
+            data += bytes(
+                [14 << 4 | (option_length if option_length < 13 else 13)]
+            )
             delta_ext = option_delta - 269
             data += bytes([delta_ext >> 8, delta_ext & 0xFF])
         elif option_delta >= 13:
-            data += bytes([13 << 4 | (option_length if option_length < 13 else 13)])
+            data += bytes(
+                [13 << 4 | (option_length if option_length < 13 else 13)]
+            )
             data += bytes([option_delta - 13])
         else:
             data += bytes(
-                [option_delta << 4 | (option_length if option_length < 13 else 13)]
+                [
+                    option_delta << 4
+                    | (option_length if option_length < 13 else 13)
+                ]
             )
 
         # Handle extended option length

@@ -9,7 +9,6 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 mypy = "^1.13.0"
-flake8 = "^7.1.1"
 pytest = "^8.3.4"
 coverage = "^7.6.10"
 pytest-cov = "^6.0.0"
@@ -23,3 +22,11 @@ coap-server = "coap_server.__main__:app"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.lint]
+# Disable E203 (whitespace before ':'),
+# because in slices (e.g. [1 : 2]) ruff formatter inserts it
+ignore = ["E203"]

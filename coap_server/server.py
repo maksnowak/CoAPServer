@@ -4,7 +4,9 @@ from coap_server.resources.base_resource import BaseResource
 
 
 class CoAPServer:
-    def __init__(self, routes: dict[str, BaseResource], host="127.0.0.1", port=5683):
+    def __init__(
+        self, routes: dict[str, BaseResource], host="127.0.0.1", port=5683
+    ):
         self.host = host
         self.port = port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

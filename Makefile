@@ -31,8 +31,7 @@ fmt: install       ## Format code using isort & ruff.
 	$(ENV_PREFIX)ruff format $(PROJECT_NAME)/
 
 .PHONY: lint
-lint: install     ## Run linters: flake8, mypy, and ruff.
-	$(ENV_PREFIX)flake8 $(PROJECT_NAME)/
+lint: install     ## Run mypy and ruff.
 	$(ENV_PREFIX)mypy --ignore-missing-imports $(PROJECT_NAME)/
 	$(ENV_PREFIX)ruff check --fix $(PROJECT_NAME)/
 
