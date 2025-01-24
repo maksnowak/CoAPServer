@@ -49,6 +49,11 @@ test: lint        ## Run tests and generate coverage reports.
 	$(ENV_PREFIX)coverage xml
 	$(ENV_PREFIX)coverage html
 
+.PHONY: docker
+docker:           ## Build the Docker image.
+	docker build -t $(PROJECT_NAME) .
+	docker run --rm $(PROJECT_NAME)
+
 .PHONY: clean
 clean:            ## Clean project by deleting files in .gitignore.
 	git clean -Xdf
