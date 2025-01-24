@@ -1,4 +1,5 @@
 import socket
+from typing import MutableMapping
 
 from coap_server.request_handler import RequestHandler
 from coap_server.resources.base_resource import BaseResource
@@ -6,7 +7,10 @@ from coap_server.resources.base_resource import BaseResource
 
 class CoAPServer:
     def __init__(
-        self, routes: dict[str, BaseResource], host="127.0.0.1", port=5683
+        self,
+        routes: MutableMapping[str, BaseResource],
+        host="127.0.0.1",
+        port=5683,
     ):
         self.host = host
         self.port = port

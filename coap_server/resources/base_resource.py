@@ -1,3 +1,5 @@
+from collections.abc import MutableMapping
+
 from coap_server.utils.constants import CoapMessage
 
 
@@ -9,7 +11,7 @@ class BaseResource:
     It provides the basic methods, that should be implemented by the child classes.
     """
 
-    objects: dict
+    objects: MutableMapping[int, MutableMapping[str, str | int]]
 
     def get(self, request: CoapMessage) -> CoapMessage:
         raise NotImplementedError("GET method not implemented.")

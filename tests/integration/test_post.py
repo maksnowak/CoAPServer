@@ -1,6 +1,12 @@
+import json
+
 from coap_server.request_handler import RequestHandler
 from coap_server.utils.constants import CoapCode, CoapMessage, CoapOption
-from coap_server.utils.parser import parse_message, encode_message
+from coap_server.utils.parser import encode_message, parse_message
+
+obj_encoded = json.dumps({"name": "New device", "temperature": 30}).encode(
+    "ascii"
+)
 
 
 def test_success(routes):
@@ -16,7 +22,7 @@ def test_success(routes):
         options={
             CoapOption.URI_PATH: b"/devices",
         },
-        payload=b'{"name": "New name"}',
+        payload=obj_encoded,
     )
 
     request_encoded = encode_message(request)
@@ -30,9 +36,9 @@ def test_success(routes):
     assert response.header_mid == 1337
     assert response.token == b"1234"
     assert response.options == {}
-    assert response.payload == b"Device created"
+    assert response.payload == obj_encoded
 
-    # Check it was actually added
+    # Assert it was actually added
     request = CoapMessage(
         header_version=1,
         header_type=0,
@@ -41,7 +47,7 @@ def test_success(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices",
+            CoapOption.URI_PATH: b"/devices/3",
         },
         payload=b"",
     )
@@ -57,13 +63,10 @@ def test_success(routes):
     assert response.header_mid == 1337
     assert response.token == b"1234"
     assert response.options == {}
-    assert (
-        response.payload
-        == b'{"1": {"name": "Device 1"}, "2": {"name": "Device 2"}, "3": {"name": "New name"}}'
-    )
+    assert response.payload == obj_encoded
 
 
-def test_failure_incorrect_uri(routes):
+def test_invalid_uri_id(routes):
     handler = RequestHandler(routes)
 
     request = CoapMessage(
@@ -76,7 +79,7 @@ def test_failure_incorrect_uri(routes):
         options={
             CoapOption.URI_PATH: b"/devices/1",
         },
-        payload=b'{"name": "New name"}',
+        payload=obj_encoded,
     )
 
     request_encoded = encode_message(request)
@@ -92,21 +95,24 @@ def test_failure_incorrect_uri(routes):
     assert response.options == {}
     assert (
         response.payload
-        == b'{"error": "POST method is not allowed for a specific device"}'
+        == b'{"error": "Method not allowed for this resource"}'
     )
 
-    # Check it was actually not added
+
+def test_invalid_uri_temperature(routes):
+    handler = RequestHandler(routes)
+
     request = CoapMessage(
         header_version=1,
         header_type=0,
         header_token_length=4,
-        header_code=CoapCode.GET,
+        header_code=CoapCode.POST,
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/devices",
+            CoapOption.URI_PATH: b"/devices/1/temperature",
         },
-        payload=b"",
+        payload=obj_encoded,
     )
 
     request_encoded = encode_message(request)
@@ -116,14 +122,17 @@ def test_failure_incorrect_uri(routes):
     assert response.header_version == 1
     assert response.header_type == 0
     assert response.header_token_length == 4
-    assert response.header_code == CoapCode.CONTENT
+    assert response.header_code == CoapCode.METHOD_NOT_ALLOWED
     assert response.header_mid == 1337
     assert response.token == b"1234"
     assert response.options == {}
-    assert response.payload == b'{"1": {"name": "Device 1"}, "2": {"name": "Device 2"}}'
+    assert (
+        response.payload
+        == b'{"error": "Method not allowed for this resource"}'
+    )
 
 
-def test_failure_invalid_json(routes):
+def test_invalid_json(routes):
     handler = RequestHandler(routes)
 
     request = CoapMessage(
@@ -150,20 +159,23 @@ def test_failure_invalid_json(routes):
     assert response.header_mid == 1337
     assert response.token == b"1234"
     assert response.options == {}
-    assert response.payload == b'{"error": "Invalid device data"}'
+    assert response.payload == b'{"error": "Invalid payload"}'
 
-    # Check it was actually not added
+
+def test_missing_fields(routes):
+    handler = RequestHandler(routes)
+
     request = CoapMessage(
         header_version=1,
         header_type=0,
         header_token_length=4,
-        header_code=CoapCode.GET,
+        header_code=CoapCode.PUT,
         header_mid=1337,
         token=b"1234",
         options={
             CoapOption.URI_PATH: b"/devices",
         },
-        payload=b"",
+        payload=b'{"name": "New name"}',
     )
 
     request_encoded = encode_message(request)
@@ -173,8 +185,8 @@ def test_failure_invalid_json(routes):
     assert response.header_version == 1
     assert response.header_type == 0
     assert response.header_token_length == 4
-    assert response.header_code == CoapCode.CONTENT
+    assert response.header_code == CoapCode.BAD_REQUEST
     assert response.header_mid == 1337
     assert response.token == b"1234"
     assert response.options == {}
-    assert response.payload == b'{"1": {"name": "Device 1"}, "2": {"name": "Device 2"}}'
+    assert response.payload == b'{"error": "Invalid payload"}'

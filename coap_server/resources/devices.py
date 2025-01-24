@@ -1,191 +1,148 @@
 import json
+from typing import MutableMapping
 
 from coap_server.resources.base_resource import BaseResource
 from coap_server.utils.constants import CoapCode, CoapMessage
+from coap_server.utils.construct_response import construct_response
 
 
 class DevicesResource(BaseResource):
-    def __init__(self, objects: dict[int, dict[str, str]]):
-        # objects = {
-        #     device_id: {
-        #         "name": "Device 1",
-        #     },
-        #     ...
-        # }
+    """
+    CoAP resource representing devices with temperature sensors.
+
+    objects = {
+       device_id: {
+           "name": "Device 1",
+           "temperature": 21,
+       },
+       ...
+    }
+    """
+
+    def __init__(
+        self, objects: MutableMapping[int, MutableMapping[str, str | int]]
+    ):
         self.objects = objects
 
+    def validate_data(self, data: dict) -> bool:
+        """Validates the received device data."""
+
+        keys = {"name", "temperature"}
+        return set(data.keys()) == keys and isinstance(
+            data["temperature"], int
+        )
+
     def get(self, request: CoapMessage) -> CoapMessage:
-        uri = request.uri
+        match request.uri.strip("/").split("/"):
+            case ["devices"]:
+                response = construct_response(
+                    request,
+                    CoapCode.CONTENT,
+                    json.dumps(self.objects).encode("ascii"),
+                )
 
-        if uri == "/devices":
-            response = CoapMessage(
-                header_version=request.header_version,
-                header_type=request.header_type,
-                header_token_length=request.header_token_length,
-                header_code=CoapCode.CONTENT,
-                header_mid=request.header_mid,
-                token=request.token,
-                options={},
-                payload=json.dumps(self.objects).encode("ascii"),
-            )
-        else:
-            device_id = int(uri.rsplit("/", 1)[-1])
+            case ["devices", device_id_str]:
+                obj = self.objects[int(device_id_str)]
 
-            response = CoapMessage(
-                header_version=request.header_version,
-                header_type=request.header_type,
-                header_token_length=request.header_token_length,
-                header_code=CoapCode.CONTENT,
-                header_mid=request.header_mid,
-                token=request.token,
-                options={},
-                payload=json.dumps(self.objects[device_id]).encode("ascii"),
-            )
+                response = construct_response(
+                    request,
+                    CoapCode.CONTENT,
+                    json.dumps(obj).encode("ascii"),
+                )
+
+            case ["devices", device_id_str, "temperature"]:
+                obj = self.objects[int(device_id_str)]
+                value = obj["temperature"]
+
+                response = construct_response(
+                    request,
+                    CoapCode.CONTENT,
+                    str(value).encode("ascii"),
+                )
+
+            case _:
+                raise ValueError
 
         return response
 
     def post(self, request: CoapMessage) -> CoapMessage:
-        try:
-            uri = request.uri
-            if uri != "/devices":
+        match request.uri.strip("/").split("/"):
+            case ["devices"]:
+                obj = json.loads(request.payload.decode())
+                if not self.validate_data(obj):
+                    raise ValueError  # TODO: bad req
+
+                ids = self.objects.keys()
+                new_id = max(ids) + 1 if ids else 1
+                self.objects[new_id] = obj
+
+                response = construct_response(
+                    request, CoapCode.CREATED, json.dumps(obj).encode("ascii")
+                )
+
+            case ["devices", device_id_str]:
+                raise AttributeError
+
+            case ["devices", device_id_str, "temperature"]:
+                raise AttributeError
+
+            case _:
                 raise ValueError
-
-            device = json.loads(request.payload.decode())
-
-            ids = self.objects.keys()
-            new_id = max(ids) + 1 if ids else 1
-            self.objects[new_id] = device
-
-            response = CoapMessage(
-                header_version=request.header_version,
-                header_type=request.header_type,
-                header_token_length=request.header_token_length,
-                header_code=CoapCode.CREATED,
-                header_mid=request.header_mid,
-                token=request.token,
-                options={},
-                payload=b"Device created",
-            )
-
-        except json.JSONDecodeError:
-            response = CoapMessage(
-                header_version=request.header_version,
-                header_type=request.header_type,
-                header_token_length=request.header_token_length,
-                header_code=CoapCode.BAD_REQUEST,
-                header_mid=request.header_mid,
-                token=request.token,
-                options={},
-                payload=b'{"error": "Invalid device data"}',
-            )
-
-        except ValueError:
-            response = CoapMessage(
-                header_version=request.header_version,
-                header_type=request.header_type,
-                header_token_length=request.header_token_length,
-                header_code=CoapCode.METHOD_NOT_ALLOWED,
-                header_mid=request.header_mid,
-                token=request.token,
-                options={},
-                payload=b'{"error": "POST method is not allowed for a specific device"}',
-            )
 
         return response
 
     def put(self, request: CoapMessage) -> CoapMessage:
-        try:
-            uri = request.uri
-            device_id = int(uri.rsplit("/", 1)[-1])
+        match request.uri.strip("/").split("/"):
+            case ["devices"]:
+                raise AttributeError
 
-            if device_id not in self.objects:
+            case ["devices", device_id_str]:
+                device_id = int(device_id_str)
+                obj = json.loads(request.payload.decode())
+                if not self.validate_data(obj):
+                    raise ValueError  # TODO: bad req
+
+                if device_id not in self.objects.keys():
+                    raise ValueError
+
+                self.objects[device_id] = obj
+
+                response = construct_response(
+                    request, CoapCode.CHANGED, json.dumps(obj).encode("ascii")
+                )
+
+            case ["devices", device_id, "temperature"]:
+                device_id = int(device_id)
+                value = int(request.payload.decode())
+
+                self.objects[device_id]["temperature"] = value
+
+                response = construct_response(
+                    request,
+                    CoapCode.CHANGED,
+                    json.dumps(self.objects[device_id]).encode("ascii"),
+                )
+
+            case _:
                 raise ValueError
-
-            device = json.loads(request.payload.decode())
-            # TODO: verify received device data is valid
-
-            self.objects[int(device_id)] = device
-
-            response = CoapMessage(
-                header_version=request.header_version,
-                header_type=request.header_type,
-                header_token_length=request.header_token_length,
-                header_code=CoapCode.CHANGED,
-                header_mid=request.header_mid,
-                token=request.token,
-                options={},
-                payload=json.dumps(device).encode("ascii"),
-            )
-
-        except ValueError:  # id doesn't exist or not int
-            response = CoapMessage(
-                header_version=request.header_version,
-                header_type=request.header_type,
-                header_token_length=request.header_token_length,
-                header_code=CoapCode.BAD_REQUEST,
-                header_mid=request.header_mid,
-                token=request.token,
-                options={},
-                payload=b'{"error": "Invalid resource id"}',
-            )
-
-        except Exception as e:
-            response = CoapMessage(
-                header_version=request.header_version,
-                header_type=request.header_type,
-                header_token_length=request.header_token_length,
-                header_code=CoapCode.BAD_REQUEST,
-                header_mid=request.header_mid,
-                token=request.token,
-                options={},
-                payload=json.dumps({"error": str(e)}).encode("ascii"),
-            )
 
         return response
 
     def delete(self, request: CoapMessage) -> CoapMessage:
-        try:
-            uri = request.uri
-            device_id = int(uri.rsplit("/", 1)[-1])
+        match request.uri.strip("/").split("/"):
+            case ["devices"]:
+                raise AttributeError
 
-            if device_id not in self.objects:
+            case ["devices", device_id_str]:
+                device_id = int(device_id_str)
+                self.objects.pop(device_id)
+
+                response = construct_response(request, CoapCode.DELETED, b"")
+
+            case ["devices", device_id, "temperature"]:
+                raise AttributeError
+
+            case _:
                 raise ValueError
-
-            self.objects.pop(device_id)
-
-            response = CoapMessage(
-                header_version=request.header_version,
-                header_type=request.header_type,
-                header_token_length=request.header_token_length,
-                header_code=CoapCode.DELETED,
-                header_mid=request.header_mid,
-                token=request.token,
-                options={},
-                payload=b"Device deleted",
-            )
-
-        except ValueError:
-            response = CoapMessage(
-                header_version=request.header_version,
-                header_type=request.header_type,
-                header_token_length=request.header_token_length,
-                header_code=CoapCode.NOT_FOUND,
-                header_mid=request.header_mid,
-                token=request.token,
-                options={},
-                payload=b'{"error": "Device not found"}',
-            )
-
-        except Exception as e:
-            response = CoapMessage(
-                header_version=request.header_version,
-                header_type=request.header_type,
-                header_token_length=request.header_token_length,
-                header_code=CoapCode.BAD_REQUEST,
-                header_mid=request.header_mid,
-                token=request.token,
-                options={},
-                payload=json.dumps({"error": str(e)}).encode("ascii"),
-            )
 
         return response

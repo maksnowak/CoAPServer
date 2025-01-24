@@ -1,6 +1,6 @@
 from coap_server.request_handler import RequestHandler
 from coap_server.utils.constants import CoapCode, CoapMessage, CoapOption
-from coap_server.utils.parser import parse_message, encode_message
+from coap_server.utils.parser import encode_message, parse_message
 
 
 def test_success(routes):
@@ -14,7 +14,7 @@ def test_success(routes):
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/temperature/1",
+            CoapOption.URI_PATH: b"/devices/1",
         },
         payload=b"",
     )
@@ -30,21 +30,18 @@ def test_success(routes):
     assert response.header_mid == 1337
     assert response.token == b"1234"
     assert response.options == {}
-    assert response.payload == b"Sensor deleted"
+    assert response.payload == b""
 
-
-def test_not_found(routes):
-    handler = RequestHandler(routes)
-
+    # Assert it was actually deleted
     request = CoapMessage(
         header_version=1,
         header_type=0,
         header_token_length=4,
-        header_code=CoapCode.DELETE,
+        header_code=CoapCode.GET,
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/temperature/2",
+            CoapOption.URI_PATH: b"/devices/1",
         },
         payload=b"",
     )
@@ -60,4 +57,34 @@ def test_not_found(routes):
     assert response.header_mid == 1337
     assert response.token == b"1234"
     assert response.options == {}
-    assert response.payload == b"Sensor not found"
+    assert response.payload == b'{"error": "Not found: /devices/1"}'
+
+
+def test_not_existing(routes):
+    handler = RequestHandler(routes)
+
+    request = CoapMessage(
+        header_version=1,
+        header_type=0,
+        header_token_length=4,
+        header_code=CoapCode.DELETE,
+        header_mid=1337,
+        token=b"1234",
+        options={
+            CoapOption.URI_PATH: b"/devices/37",
+        },
+        payload=b"",
+    )
+
+    request_encoded = encode_message(request)
+    response_encoded = handler.handle_request(request_encoded)
+    response = parse_message(response_encoded)
+
+    assert response.header_version == 1
+    assert response.header_type == 0
+    assert response.header_token_length == 4
+    assert response.header_code == CoapCode.NOT_FOUND
+    assert response.header_mid == 1337
+    assert response.token == b"1234"
+    assert response.options == {}
+    assert response.payload == b'{"error": "Not found: /devices/37"}'
