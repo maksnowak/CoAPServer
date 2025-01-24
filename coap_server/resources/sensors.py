@@ -49,12 +49,8 @@ class SensorsResource(BaseResource):
             case ["sensors", sensor_id_str]:
                 try:
                     sensor_id = int(sensor_id_str)
-                except ValueError:
-                    raise NotFoundError
-
-                try:
                     obj = self.objects[sensor_id]
-                except KeyError:
+                except (ValueError, KeyError):
                     raise NotFoundError
 
                 response = construct_response(
@@ -125,13 +121,11 @@ class SensorsResource(BaseResource):
             case ["sensors", sensor_id_str]:
                 try:
                     sensor_id = int(sensor_id_str)
-                except ValueError:
-                    raise NotFoundError
-
-                try:
                     obj = json.loads(request.payload.decode())
                 except json.JSONDecodeError:
                     raise BadRequestError
+                except ValueError:
+                    raise NotFoundError
 
                 if not self.validate_data(obj):
                     raise BadRequestError
