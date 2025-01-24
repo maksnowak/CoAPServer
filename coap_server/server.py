@@ -1,5 +1,7 @@
 import socket
 from coap_server.request_handler import RequestHandler
+from coap_server.resources.devices import DevicesResource
+from coap_server.resources.temperature_sensor import TemperatureSensorResource
 
 
 class CoAPServer:
@@ -7,7 +9,11 @@ class CoAPServer:
         self.host = host
         self.port = port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.handler = RequestHandler()
+        self.routes = {
+            "/devices": DevicesResource({1: {"name": "Device 1"}}),
+            "/temperature": TemperatureSensorResource({1: 25}),
+        }
+        self.handler = RequestHandler(self.routes)
 
     def start(self):
         self.sock.bind((self.host, self.port))
