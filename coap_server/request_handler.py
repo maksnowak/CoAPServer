@@ -32,7 +32,7 @@ class RequestHandler:
 
         try:
             for route, res in self.routes.items():
-                if request.uri.startswith(route):
+                if request.uri.lstrip("/").startswith(route):
                     resource = res
                     break
             else:

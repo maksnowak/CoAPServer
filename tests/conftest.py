@@ -23,5 +23,5 @@ def sensors() -> MutableMapping[int, MutableMapping[str, str | int]]:
 @pytest.fixture
 def routes(sensors) -> MutableMapping[str, BaseResource]:
     return {
-        "/sensors": SensorsResource(sensors),
+        "sensors": SensorsResource(sensors),
     }

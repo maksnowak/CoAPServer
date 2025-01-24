@@ -33,7 +33,7 @@ def start(
     logger.info(f"Starting CoAP Server on {host}:{port}")
 
     routes: MutableMapping[str, BaseResource] = {
-        "/sensors": SensorsResource(
+        "sensors": SensorsResource(
             {
                 1: {"name": "Sensor 1", "temperature": 21},
                 2: {"name": "Sensor 2", "temperature": 25},
