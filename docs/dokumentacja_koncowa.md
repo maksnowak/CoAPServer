@@ -153,14 +153,132 @@ Funkcja ta przyjmuje jako parametr wejściowy strukturę `CoapMessage`, zawieraj
 
 ## `utils/construct_response.py`
 
-Plik ten zawiera funkcję `construct_response()`, wykorzystywaną przez konkretne zasoby. Przyjmuje ona żądanie w postaci struktury `CoapMessage`.
+Plik ten zawiera funkcję `construct_response()`, wykorzystywaną przez konkretne zasoby. Przyjmuje ona żądanie w postaci struktury `CoapMessage`, kod odpowiedzi oraz treść odpowiedzi. Funkcja ta zwraca strukturę `CoapMessage` reprezentującą odpowiedź serwera.
 
 # Opis interfejsu użytkownika
 
+Serwer CoAP nie posiada interfejsu użytkownika. Po uruchomieniu serwera widoczne są jedynie logi zdarzeń, które mają miejsce podczas jego działania.
+
 # Flagi konfiguracyjne
+
+Nasza implementacja serwera CoAP posiada flagi konfiguracyjne, podawane w postaci argumentów wiersza poleceń. Są to:
+- `--host` - adres IP serwera
+- `--port` - numer portu, na którym serwer ma nasłuchiwać
+- `--verbose` - poziom szczegółowości logów
+    - `-v` - tylko ostrzeżenia
+    - `-vv` - ostrzeżenia oraz logi informacyjne
+    - `-vvv` - ostrzeżenia, logi informacyjne oraz debugowe
 
 # Postać logów
 
+Logi mają następujący format:
+```bash
+<timestamp> [<log_level>] <message>
+```
+
+Gdzie:
+- `timestamp` - data i godzina zdarzenia
+- `log_level` - poziom logów (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+- `message` - treść logu
+
+Oto przykładowy zapis logów:
+```bash
+2025-01-24 08:50:01,812 [DEBUG] Received data from ('127.0.0.1', 48990)
+2025-01-24 08:50:01,812 [DEBUG] Handling request: CoapMessage(header_version=1, header_type=0, header_token_length=4, header_code=<CoapCode.GET: '0.01'>, header_mid=1337, token=b'1234', options={<CoapOption.URI_PATH: 11>: b'/sensors'}, payload=b'')
+2025-01-24 08:50:01,815 [INFO] Received GET request for URI: /sensors
+2025-01-24 08:50:01,815 [DEBUG] Returning all sensor data
+2025-01-24 08:50:01,815 [INFO] Request to /sensors handled successfully
+2025-01-24 08:50:01,815 [DEBUG] Sent response to ('127.0.0.1', 48990)
+```
+
 # Wykorzystane narzędzia
 
+- `Docker` - konteneryzacja aplikacji
+- `poetry` - zarządzanie zależnościami
+- `ruff` - linter oraz formatter
+- `mypy` - analiza statyczna
+- `pytest` - testy jednostkowe oraz integracyjne
+- `typer` - tworzenie interfejsu CLI
+
+## Narzędzie CLI
+
+W celu ułatwienia wysyłania żądań do serwera CoAP, przygotowaliśmy narzędzie CLI, przypominające narzędzie `curl`. Narzędzie to pozwala na wysyłanie żądań `GET`, `POST`, `PUT`, oraz `DELETE` do serwera CoAP.
+
+### Uruchomienie
+
+Aby uruchomić narzędzie CLI, należy wykonać poniższą komendę:
+```bash
+python cli.py <uri> [options]
+```
+
+Gdzie:
+- `uri` - adres URL serwera CoAP
+- `options` - dodatkowe opcje, zależne od żądania:
+    - `--method` - metoda żądania (GET, POST, PUT, DELETE)
+    - `--data` - dane do przesłania w żądaniu (dla POST i PUT)
+    - `--verbose` - poziom szczegółowości logów
+        - `-v` - tylko ostrzeżenia
+        - `-vv` - ostrzeżenia oraz logi informacyjne
+        - `-vvv` - ostrzeżenia, logi informacyjne oraz debugowe
+
 # Testy
+
+## Testy jednostkowe
+
+Nasz projekt zawiera testy jednostkowe tylko dla funkcji parsujących wiadomości CoAP. Testy te sprawdzają poprawność działania funkcji `parse_message()` oraz `encode_message()`.
+
+## Testy integracyjne
+
+Testy integracyjne sprawdzają poprawność komunikacji klient-serwer. Symulują one wysłanie żądania do serwera, a następnie sprawdzają, czy serwer poprawnie odpowiedział na dane żądanie i czy zasoby zostały poprawnie zaktualizowane.
+
+Dodatkowo testy integracyjne sprawdzają stabilność systemu, czyli czy serwer poprawnie obsługuje wielu klientów jednocześnie.
+
+## Testy manualne
+
+Testy manualne polegają na ręcznym wysłaniu żądań do serwera CoAP za pomocą narzędzia CLI oraz sprawdzeniu, czy serwer poprawnie odpowiedział na dane żądanie.
+
+Oto przykładowy test manualny:
+
+1. Uruchomienie serwera:
+    ```bash
+    make run
+    ```
+2. Wysłanie żądania GET do zasobu `/sensors`:
+    ```bash
+    python cli.py coap://localhost:5683/sensors
+    ```
+3. Otrzymane rezultaty:
+
+    - Klient:
+    ```
+    (psi) (coap-server-py3.11) 09:06:22 maks@RYZEN:~/psi-projekt$ python3 cli.py coap://localhost:5683/sensors
+    Response Code: CoapCode.CONTENT
+    Data: {"1": {"name": "Sensor 1", "temperature": 21}, "2": {"name": "Sensor 2", "temperature": 25}}
+    (psi) (coap-server-py3.11) 09:48:58 maks@RYZEN:~/psi-projekt$ 
+    ```
+    - Serwer:
+    ```
+    2025-01-24 09:48:51,001 [INFO] Starting CoAP Server on 127.0.0.1:5683
+    2025-01-24 09:48:51,001 [INFO] CoAP Server started on 127.0.0.1:5683
+    2025-01-24 09:48:57,998 [DEBUG] Received data from ('127.0.0.1', 40865)
+    2025-01-24 09:48:57,999 [DEBUG] Handling request: CoapMessage(header_version=1, header_type=0, header_token_length=4, header_code=<CoapCode.GET: '0.01'>, header_mid=1337, token=b'1234', options={<CoapOption.URI_PATH: 11>: b'/sensors'}, payload=b'')
+    2025-01-24 09:48:57,999 [INFO] Received GET request for URI: /sensors
+    2025-01-24 09:48:57,999 [DEBUG] Returning all sensor data
+    2025-01-24 09:48:57,999 [INFO] Request to /sensors handled successfully
+    2025-01-24 09:48:57,999 [DEBUG] Sent response to ('127.0.0.1', 40865)
+    ```
+
+Żądanie zostało obsłużone poprawnie, serwer zwrócił kod odpowiedzi `CoapCode.CONTENT` oraz listę dostępnych czujników.
+
+Dodatkowo, w celu weryfikacji poprawności działania naszego narzędzia CLI, uruchomiliśmy ten sam test przy wykorzystaniu klienta `aiocoap`. W odpowiedzi otrzymaliśmy ten sam rezultat, co potwierdza poprawność działania naszego narzędzia.
+
+## Pokrycie
+
+Pokrycie testami naszego serwera wynosi 82%.
+
+# Podsumowanie
+
+- Nasz serwer CoAP działa poprawnie i obsługuje żądania `GET`, `POST`, `PUT`, oraz `DELETE`.
+- Posiada on modularną architekturę, pozwalającą na łatwą rozbudowę żądań. 
+- Serwer również poprawnie obsługuję wielu klientów jednocześnie.
+- Spełnione zostały wszystkie założenia funkcjonalne oraz niefunkcjonalne.
