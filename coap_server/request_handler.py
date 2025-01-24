@@ -18,7 +18,7 @@ class RequestHandler:
     Handles incoming CoAP requests by routing them to the appropriate resource.
 
     routes = {
-        "/name": Resource(),
+        "name": Resource(),
         ...
     }
     """
