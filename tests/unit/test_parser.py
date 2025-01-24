@@ -11,17 +11,17 @@ def test_encode_message():
         header_mid=1337,
         token=b"1234",
         options={
-            CoapOption.URI_PATH: b"/temperature/1",
+            CoapOption.URI_PATH: b"/devices",
         },
         payload=b"",
     )
 
     request_encoded = encode_message(request)
-    assert request_encoded == b"D\x01\x0591234\xbe/temperature/1"
+    assert request_encoded == b"D\x01\x0591234\xb8/devices"
 
 
 def test_parse_message():
-    response_encoded = b"D\x01\x0591234\xbe/temperature/1"
+    response_encoded = b"D\x01\x0591234\xb8/devices"
 
     response = parse_message(response_encoded)
 
@@ -32,6 +32,6 @@ def test_parse_message():
     assert response.header_mid == 1337
     assert response.token == b"1234"
     assert response.options == {
-        CoapOption.URI_PATH: b"/temperature/1",
+        CoapOption.URI_PATH: b"/devices",
     }
     assert response.payload == b""
