@@ -4,6 +4,11 @@ from typing import Callable, MutableMapping
 from coap_server.resources.base_resource import BaseResource
 from coap_server.utils.constants import CoapCode, CoapMessage
 from coap_server.utils.construct_response import construct_response
+from coap_server.utils.exceptions import (
+    BadRequestError,
+    MethodNotAllowedError,
+    NotFoundError,
+)
 from coap_server.utils.parser import encode_message, parse_message
 
 
@@ -25,12 +30,12 @@ class RequestHandler:
                     resource = res
                     break
             else:
-                raise ValueError
+                raise NotFoundError
 
             method = self.get_resource_method(request, resource)
             response = method(request)
 
-        except AttributeError:
+        except MethodNotAllowedError:
             response = construct_response(
                 request,
                 CoapCode.METHOD_NOT_ALLOWED,
@@ -39,20 +44,27 @@ class RequestHandler:
                 ).encode("ascii"),
             )
 
-        except json.JSONDecodeError:
-            response = construct_response(
-                request,
-                CoapCode.BAD_REQUEST,
-                json.dumps({"error": "Invalid payload"}).encode("ascii"),
-            )
-
-        except (ValueError, KeyError):
+        except NotFoundError:
             response = construct_response(
                 request,
                 CoapCode.NOT_FOUND,
                 json.dumps({"error": f"Not found: {request.uri}"}).encode(
                     "ascii"
                 ),
+            )
+
+        except BadRequestError:
+            response = construct_response(
+                request,
+                CoapCode.BAD_REQUEST,
+                json.dumps({"error": "Invalid payload"}).encode("ascii"),
+            )
+
+        except Exception as e:
+            response = construct_response(
+                request,
+                CoapCode.BAD_REQUEST,
+                json.dumps({"error": repr(e)}).encode("ascii"),
             )
 
         return encode_message(response)
@@ -69,6 +81,4 @@ class RequestHandler:
         elif request.header_code == CoapCode.DELETE:
             return resource.delete
 
-        raise AttributeError(
-            f"Method {request.header_code} not allowed for this resource."
-        )
+        raise MethodNotAllowedError

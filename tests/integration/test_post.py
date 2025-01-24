@@ -169,7 +169,7 @@ def test_missing_fields(routes):
         header_version=1,
         header_type=0,
         header_token_length=4,
-        header_code=CoapCode.PUT,
+        header_code=CoapCode.POST,
         header_mid=1337,
         token=b"1234",
         options={

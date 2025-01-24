@@ -4,6 +4,11 @@ from typing import MutableMapping
 from coap_server.resources.base_resource import BaseResource
 from coap_server.utils.constants import CoapCode, CoapMessage
 from coap_server.utils.construct_response import construct_response
+from coap_server.utils.exceptions import (
+    BadRequestError,
+    MethodNotAllowedError,
+    NotFoundError,
+)
 
 
 class DevicesResource(BaseResource):
@@ -42,7 +47,15 @@ class DevicesResource(BaseResource):
                 )
 
             case ["devices", device_id_str]:
-                obj = self.objects[int(device_id_str)]
+                try:
+                    device_id = int(device_id_str)
+                except ValueError:
+                    raise NotFoundError
+
+                try:
+                    obj = self.objects[device_id]
+                except KeyError:
+                    raise NotFoundError
 
                 response = construct_response(
                     request,
@@ -51,7 +64,16 @@ class DevicesResource(BaseResource):
                 )
 
             case ["devices", device_id_str, "temperature"]:
-                obj = self.objects[int(device_id_str)]
+                try:
+                    device_id = int(device_id_str)
+                except ValueError:
+                    raise NotFoundError
+
+                try:
+                    obj = self.objects[device_id]
+                except KeyError:
+                    raise NotFoundError
+
                 value = obj["temperature"]
 
                 response = construct_response(
@@ -61,16 +83,20 @@ class DevicesResource(BaseResource):
                 )
 
             case _:
-                raise ValueError
+                raise NotFoundError
 
         return response
 
     def post(self, request: CoapMessage) -> CoapMessage:
         match request.uri.strip("/").split("/"):
             case ["devices"]:
-                obj = json.loads(request.payload.decode())
+                try:
+                    obj = json.loads(request.payload.decode())
+                except json.JSONDecodeError:
+                    raise BadRequestError
+
                 if not self.validate_data(obj):
-                    raise ValueError  # TODO: bad req
+                    raise BadRequestError
 
                 ids = self.objects.keys()
                 new_id = max(ids) + 1 if ids else 1
@@ -81,29 +107,37 @@ class DevicesResource(BaseResource):
                 )
 
             case ["devices", device_id_str]:
-                raise AttributeError
+                raise MethodNotAllowedError
 
             case ["devices", device_id_str, "temperature"]:
-                raise AttributeError
+                raise MethodNotAllowedError
 
             case _:
-                raise ValueError
+                raise NotFoundError
 
         return response
 
     def put(self, request: CoapMessage) -> CoapMessage:
         match request.uri.strip("/").split("/"):
             case ["devices"]:
-                raise AttributeError
+                raise MethodNotAllowedError
 
             case ["devices", device_id_str]:
-                device_id = int(device_id_str)
-                obj = json.loads(request.payload.decode())
+                try:
+                    device_id = int(device_id_str)
+                except ValueError:
+                    raise NotFoundError
+
+                try:
+                    obj = json.loads(request.payload.decode())
+                except json.JSONDecodeError:
+                    raise BadRequestError
+
                 if not self.validate_data(obj):
-                    raise ValueError  # TODO: bad req
+                    raise BadRequestError
 
                 if device_id not in self.objects.keys():
-                    raise ValueError
+                    raise NotFoundError
 
                 self.objects[device_id] = obj
 
@@ -124,25 +158,32 @@ class DevicesResource(BaseResource):
                 )
 
             case _:
-                raise ValueError
+                raise NotFoundError
 
         return response
 
     def delete(self, request: CoapMessage) -> CoapMessage:
         match request.uri.strip("/").split("/"):
             case ["devices"]:
-                raise AttributeError
+                raise MethodNotAllowedError
 
             case ["devices", device_id_str]:
-                device_id = int(device_id_str)
+                try:
+                    device_id = int(device_id_str)
+                except ValueError:
+                    raise NotFoundError
+
+                if device_id not in self.objects:
+                    raise NotFoundError
+
                 self.objects.pop(device_id)
 
                 response = construct_response(request, CoapCode.DELETED, b"")
 
             case ["devices", device_id, "temperature"]:
-                raise AttributeError
+                raise MethodNotAllowedError
 
             case _:
-                raise ValueError
+                raise NotFoundError
 
         return response
