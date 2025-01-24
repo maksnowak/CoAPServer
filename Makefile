@@ -24,16 +24,16 @@ install:          ## Install dependencies using Poetry.
 	fi
 	$(POETRY) install
 	$(ENV_PREFIX)pre-commit install
+	echo
 
 .PHONY: fmt
-fmt: install       ## Format code using isort & ruff.
-	$(ENV_PREFIX)isort $(PROJECT_NAME)/
-	$(ENV_PREFIX)ruff format $(PROJECT_NAME)/
+fmt: install       ## Format code using ruff.
+	$(ENV_PREFIX)ruff check --fix $(PROJECT_NAME)/
 
 .PHONY: lint
 lint: install     ## Run mypy and ruff.
 	$(ENV_PREFIX)mypy --ignore-missing-imports $(PROJECT_NAME)/
-	$(ENV_PREFIX)ruff check --fix $(PROJECT_NAME)/
+	$(ENV_PREFIX)ruff check $(PROJECT_NAME)/
 
 .PHONY: run
 run: install      ## Run the project.

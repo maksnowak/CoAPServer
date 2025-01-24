@@ -1,6 +1,7 @@
+import json
+
 from coap_server.resources.base_resource import BaseResource
 from coap_server.utils.constants import CoapCode, CoapMessage
-import json
 
 
 class DevicesResource(BaseResource):

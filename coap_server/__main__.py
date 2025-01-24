@@ -1,7 +1,8 @@
+import typer
+
 from coap_server.resources.devices import DevicesResource
 from coap_server.resources.temperature_sensor import TemperatureSensorResource
 from coap_server.server import CoAPServer
-import typer
 
 app = typer.Typer()
 

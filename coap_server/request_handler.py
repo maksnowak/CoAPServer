@@ -1,4 +1,5 @@
 from typing import Callable
+
 from coap_server.resources.base_resource import BaseResource
 from coap_server.utils.constants import CoapCode, CoapMessage
 from coap_server.utils.parser import encode_message, parse_message

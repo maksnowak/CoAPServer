@@ -1,4 +1,5 @@
 import socket
+
 from coap_server.request_handler import RequestHandler
 from coap_server.resources.base_resource import BaseResource
 

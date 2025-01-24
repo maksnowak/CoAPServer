@@ -30,3 +30,6 @@ line-length = 79
 # Disable E203 (whitespace before ':'),
 # because in slices (e.g. [1 : 2]) ruff formatter inserts it
 ignore = ["E203"]
+
+# Enable isort rules for import sorting
+select = ["I"]
