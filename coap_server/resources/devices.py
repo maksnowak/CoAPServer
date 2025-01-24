@@ -141,3 +141,50 @@ class DevicesResource(BaseResource):
             )
 
         return response
+
+    def delete(self, request: CoapMessage) -> CoapMessage:
+        try:
+            uri = request.uri
+            device_id = int(uri.rsplit("/", 1)[-1])
+
+            if device_id not in self.objects:
+                raise ValueError
+
+            self.objects.pop(device_id)
+
+            response = CoapMessage(
+                header_version=request.header_version,
+                header_type=request.header_type,
+                header_token_length=request.header_token_length,
+                header_code=CoapCode.DELETED,
+                header_mid=request.header_mid,
+                token=request.token,
+                options={},
+                payload=b"Device deleted",
+            )
+
+        except ValueError:
+            response = CoapMessage(
+                header_version=request.header_version,
+                header_type=request.header_type,
+                header_token_length=request.header_token_length,
+                header_code=CoapCode.NOT_FOUND,
+                header_mid=request.header_mid,
+                token=request.token,
+                options={},
+                payload=b'{"error": "Device not found"}',
+            )
+
+        except Exception as e:
+            response = CoapMessage(
+                header_version=request.header_version,
+                header_type=request.header_type,
+                header_token_length=request.header_token_length,
+                header_code=CoapCode.BAD_REQUEST,
+                header_mid=request.header_mid,
+                token=request.token,
+                options={},
+                payload=json.dumps({"error": str(e)}).encode("ascii"),
+            )
+
+        return response
