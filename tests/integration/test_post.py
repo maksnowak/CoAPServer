@@ -190,3 +190,35 @@ def test_missing_fields(routes):
     assert response.token == b"1234"
     assert response.options == {}
     assert response.payload == b'{"error": "Invalid payload"}'
+
+
+def test_invalid_path(routes):
+    handler = RequestHandler(routes)
+
+    request = CoapMessage(
+        header_version=1,
+        header_type=0,
+        header_token_length=4,
+        header_code=CoapCode.POST,
+        header_mid=1337,
+        token=b"1234",
+        options={
+            CoapOption.URI_PATH: b"/sensors/1/temperature/1",
+        },
+        payload=obj_encoded,
+    )
+
+    request_encoded = encode_message(request)
+    response_encoded = handler.handle_request(request_encoded)
+    response = parse_message(response_encoded)
+
+    assert response.header_version == 1
+    assert response.header_type == 0
+    assert response.header_token_length == 4
+    assert response.header_code == CoapCode.NOT_FOUND
+    assert response.header_mid == 1337
+    assert response.token == b"1234"
+    assert response.options == {}
+    assert (
+        response.payload == b'{"error": "Not found: /sensors/1/temperature/1"}'
+    )

@@ -118,10 +118,10 @@ class SensorsResource(BaseResource):
                     request, CoapCode.CREATED, json.dumps(obj).encode("ascii")
                 )
 
-            case ["sensors", sensor_id_str]:
+            case ["sensors", _]:
                 raise MethodNotAllowedError
 
-            case ["sensors", sensor_id_str, "temperature"]:
+            case ["sensors", _, "temperature"]:
                 raise MethodNotAllowedError
 
             case _:
