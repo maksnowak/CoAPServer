@@ -45,7 +45,7 @@ run: install      ## Run the project.
 
 .PHONY: test
 test: lint        ## Run tests and generate coverage reports.
-	$(ENV_PREFIX)pytest -v --cov-config .coveragerc --cov=$(PROJECT_NAME) -l --tb=short --maxfail=1 $(TESTS)/
+	$(ENV_PREFIX)pytest -v --cov-config .coveragerc --cov=$(PROJECT_NAME) --cov-branch -l --tb=short --maxfail=1 $(TESTS)/
 	$(ENV_PREFIX)coverage xml
 	$(ENV_PREFIX)coverage html
 
