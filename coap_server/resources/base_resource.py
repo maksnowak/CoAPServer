@@ -9,6 +9,8 @@ class BaseResource:
     It provides the basic methods, that should be implemented by the child classes.
     """  # noqa: E501
 
+    objects: dict
+
     def get(self, request: CoapMessage) -> CoapMessage:
         raise NotImplementedError("GET method not implemented.")
 
@@ -20,3 +22,6 @@ class BaseResource:
 
     def delete(self, request: CoapMessage) -> CoapMessage:
         raise NotImplementedError("DELETE method not implemented.")
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(objects={self.objects})"

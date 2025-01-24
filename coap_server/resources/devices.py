@@ -4,14 +4,14 @@ import json
 
 
 class DevicesResource(BaseResource):
-    def __init__(self, devices: dict[int, dict[str, str]]):
-        # devices = {
+    def __init__(self, objects: dict[int, dict[str, str]]):
+        # objects = {
         #     device_id: {
         #         "name": "Device 1",
         #     },
         #     ...
         # }
-        self.devices = devices
+        self.objects = objects
 
     def get(self, request: CoapMessage) -> CoapMessage:
         uri = request.uri
@@ -25,7 +25,7 @@ class DevicesResource(BaseResource):
                 header_mid=request.header_mid,
                 token=request.token,
                 options={},
-                payload=json.dumps(self.devices).encode("ascii"),
+                payload=json.dumps(self.objects).encode("ascii"),
             )
         else:
             device_id = int(uri.rsplit("/", 1)[-1])
@@ -38,7 +38,7 @@ class DevicesResource(BaseResource):
                 header_mid=request.header_mid,
                 token=request.token,
                 options={},
-                payload=json.dumps(self.devices[device_id]).encode("ascii"),
+                payload=json.dumps(self.objects[device_id]).encode("ascii"),
             )
 
         return response
@@ -51,9 +51,9 @@ class DevicesResource(BaseResource):
 
             device = json.loads(request.payload.decode())
 
-            ids = self.devices.keys()
+            ids = self.objects.keys()
             new_id = max(ids) + 1 if ids else 1
-            self.devices[new_id] = device
+            self.objects[new_id] = device
 
             response = CoapMessage(
                 header_version=request.header_version,
@@ -97,13 +97,13 @@ class DevicesResource(BaseResource):
             uri = request.uri
             device_id = int(uri.rsplit("/", 1)[-1])
 
-            if device_id not in self.devices:
+            if device_id not in self.objects:
                 raise ValueError
 
             device = json.loads(request.payload.decode())
             # TODO: verify received device data is valid
 
-            self.devices[int(device_id)] = device
+            self.objects[int(device_id)] = device
 
             response = CoapMessage(
                 header_version=request.header_version,
@@ -141,6 +141,3 @@ class DevicesResource(BaseResource):
             )
 
         return response
-
-    def __repr__(self) -> str:
-        return f"DevicesResource(devices={self.devices})"

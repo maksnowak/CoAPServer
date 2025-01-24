@@ -3,18 +3,18 @@ from coap_server.utils.constants import CoapCode, CoapMessage, CoapOption
 
 
 class TemperatureSensorResource(BaseResource):
-    def __init__(self, sensors: dict[int, int]):
-        # sensors = {
+    def __init__(self, objects: dict[int, int]):
+        # objects = {
         #     sensor_id: temperature,
         #     ...
         # }
-        self.sensors = sensors
+        self.objects = objects
 
     def get(self, request: CoapMessage) -> CoapMessage:
         sensor_id = int(
             request.options.get(CoapOption.URI_PATH, b"-1").decode().rsplit("/", 1)[-1]
         )
-        if sensor_id not in self.sensors.keys():
+        if sensor_id not in self.objects.keys():
             return CoapMessage(
                 header_version=request.header_version,
                 header_type=request.header_type,
@@ -26,7 +26,7 @@ class TemperatureSensorResource(BaseResource):
                 payload=b"Sensor not found",
             )
 
-        temperature = self.sensors.get(sensor_id, None)
+        temperature = self.objects.get(sensor_id, None)
         payload = f"Temperature is {temperature}C".encode()
         response = CoapMessage(
             header_version=request.header_version,
@@ -45,7 +45,7 @@ class TemperatureSensorResource(BaseResource):
         sensor_id = int(
             request.options.get(CoapOption.URI_PATH, b"-1").decode().rsplit("/", 1)[-1]
         )
-        if sensor_id not in self.sensors.keys():
+        if sensor_id not in self.objects.keys():
             return CoapMessage(
                 header_version=request.header_version,
                 header_type=request.header_type,
@@ -57,7 +57,7 @@ class TemperatureSensorResource(BaseResource):
                 payload=b"Sensor not found",
             )
 
-        self.sensors.pop(sensor_id, None)
+        self.objects.pop(sensor_id, None)
         response = CoapMessage(
             header_version=request.header_version,
             header_type=request.header_type,
@@ -70,6 +70,3 @@ class TemperatureSensorResource(BaseResource):
         )
 
         return response
-
-    def __repr__(self) -> str:
-        return f"TemperatureSensorResource(sensors={self.sensors})"
