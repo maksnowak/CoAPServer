@@ -155,7 +155,7 @@ docker build -t coap_server .
 #### 4. Uruchom kontener
 
 ```bash
-docker run coap_server
+docker run -p 5683:5683 coap_server
 ```
 
 ### Za pomocą pythona
