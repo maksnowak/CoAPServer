@@ -1,11 +1,11 @@
+#!/usr/bin/env python3
 # type: ignore
 
 import asyncio
 from urllib.parse import urlparse
 
-import typer
-
 import aiocoap
+import typer
 
 app = typer.Typer()
 
