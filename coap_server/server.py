@@ -1,3 +1,4 @@
+import signal
 import socket
 from typing import MutableMapping
 
@@ -18,15 +19,18 @@ class CoAPServer:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.routes = routes
         self.handler = RequestHandler(self.routes)
+        self.running = False
+
+        signal.signal(signal.SIGTERM, self.handle_sigterm)
 
     def start(self):
         self.running = True
         self.sock.bind((self.host, self.port))
+        self.sock.settimeout(1)
         logger.info(f"CoAP Server started on {self.host}:{self.port}")
 
         while self.running:
             try:
-                self.sock.settimeout(1)
                 data, addr = self.sock.recvfrom(1024)
                 logger.debug(f"Received data from {addr}")
 
@@ -36,9 +40,22 @@ class CoAPServer:
 
             except socket.timeout:
                 continue
+
+            except KeyboardInterrupt:
+                logger.info("Received Ctrl+C, shutting down...")
+                self.shutdown()
+
             except OSError as e:
-                logger.error(f"Server error: {e}")
-                break
+                # ignore errors caused by closing the socket after SIGTERM
+                if self.running:
+                    logger.error(f"Server error: {e}")
+                    self.shutdown()
+
+    def handle_sigterm(self, signum, frame):
+        """Handle SIGTERM signal by shutting down the server gracefully."""
+
+        logger.info("Received SIGTERM signal, shutting down...")
+        self.shutdown()
 
     def shutdown(self):
         self.running = False
