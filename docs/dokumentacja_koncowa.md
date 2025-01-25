@@ -144,13 +144,29 @@ git clone https://gitlab-stud.elka.pw.edu.pl/mmachnik/psi-projekt.git
 cd psi-projekt
 ```
 
-### 3. Zainstaluj wszystkie potrzebne zależności:
+### Za pomocą dockera
+
+#### 3. Zbuduj obraz
+
+```bash
+docker build -t coap_server .
+```
+
+#### 4. Uruchom kontener
+
+```bash
+docker run coap_server
+```
+
+### Za pomocą pythona
+
+#### 3. Zainstaluj wszystkie potrzebne zależności:
 
 ```bash
 make install
 ```
 
-### 4. Uruchom serwer:
+#### 4. Uruchom serwer:
 
 ```bash
 make run
