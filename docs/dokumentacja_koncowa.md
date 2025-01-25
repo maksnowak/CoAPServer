@@ -298,7 +298,7 @@ make run
 #### 2. Wysłanie żądania GET do zasobu `/sensors`:
 
 ```bash
-poetry run python cli.py coap://127.0.0.1/sensors
+poetry run python cli.py coap://localhost:5683/sensors
 ```
 
 lub
