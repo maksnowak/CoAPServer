@@ -108,6 +108,28 @@ W projekcie planowane są trzy główne bloki funkcjonalne:
 - 13.01 – 19.01: Implementacja pozostałych metod, przygotowanie testów
 - 20.01 – 24.01: Weryfikacja poprawności rozwiązania, przygotowanie dokumentacji końcowej
 
+## Opis protokołu
+
+Protokół CoAP jest protokołem binarnym bazującym na protokole UDP, zaprojektowanym do użytku na urządzeniach o ograniczonych zasobach sprzętowych, w szczególności dla urządzeń IoT. Wzorowany jest na HTTP i używa podobnej struktury zasobów jak model REST. Żądania oznaczone są kodami `0.*`, po których zwracana jest odpowiedź z jednym z 3 typów kodów.
+
+### Przetwarzanie wiadomości
+
+Struktura wiadomości:
+- Nagłówek, 4 bajty
+  - Wersja
+  - Typ wiadomości 
+    - żądanie, potwierdzane lub niepotwierdzane
+    - odpowiedź, z danymi lub dane dosłane później
+  - Długość tokena
+  - Kod wiadomości
+  - Identyfikator wiadomości 
+- Token, od 0 do 8 bajtów
+- Opcje (opcjonalne)
+- Payload (opcjonalne)
+  - Zaczyna się za znacznikiem `0xFF` 
+
+Po przetworzeniu zapytania zwracana jest odpowiedź lub błąd, pomyślne odpowiedzi oznaczone są kodem `2.*`, błędy po stronie klienta `4.*` i błędy po stronie serwera `5.*`.
+
 ## Instrukcja uruchomienia
 
 ### 1. Sklonuj repozytorium
