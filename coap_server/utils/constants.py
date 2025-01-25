@@ -46,6 +46,10 @@ class CoapCode(Enum):
     RELEASE = "7.04"
     ABORT = "7.05"
 
+    def __str__(self) -> str:
+        name = self.name.replace("_", " ").capitalize()
+        return f"{self.value} {name}"
+
 
 class CoapOption(Enum):
     IF_MATCH = 1

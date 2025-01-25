@@ -269,7 +269,7 @@ Klient:
 
 ```
 (psi) (coap-server-py3.11) 09:06:22 maks@RYZEN:~/psi-projekt$ python3 cli.py coap://localhost:5683/sensors
-Response Code: CoapCode.CONTENT
+Response Code: 2.05 Content
 Data: {"1": {"name": "Sensor 1", "temperature": 21}, "2": {"name": "Sensor 2", "temperature": 25}}
 (psi) (coap-server-py3.11) 09:48:58 maks@RYZEN:~/psi-projekt$
 ```
