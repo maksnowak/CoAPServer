@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-# type: ignore
+
+"""
+A CLI tool to send CoAP requests, similarly to the curl.
+Uses external aiocoap library.
+"""
 
 import asyncio
 from urllib.parse import urlparse

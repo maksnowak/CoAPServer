@@ -1,15 +1,11 @@
+"""Module providing functions to decode and encode CoAP messages."""
+
 from coap_server.utils.constants import CoapCode, CoapMessage, CoapOption
 
 
 def parse_message(data: bytes) -> CoapMessage:
     """
-    Parse the CoAP message data and return a CoapMessage.
-
-    :param data: CoAP request data
-    :type data: bytes
-
-    :return: CoAP request data
-    :rtype: CoapRequest
+    Parse the CoAP message data and return a CoapMessage object.
     """
 
     header_version = (0xC0 & data[0]) >> 6
@@ -73,6 +69,10 @@ def parse_message(data: bytes) -> CoapMessage:
 
 
 def encode_message(message: CoapMessage) -> bytes:
+    """
+    Encode CoapMessage and return encoded CoAP message data.
+    """
+
     data = bytes()
 
     # First byte: Version (2 bits), Type (2 bits), Token Length (4 bits)

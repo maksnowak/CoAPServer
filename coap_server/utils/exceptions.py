@@ -1,3 +1,6 @@
+"""Custom exceptions for handling CoAP requests errors."""
+
+
 class MethodNotAllowedError(Exception):
     pass
 

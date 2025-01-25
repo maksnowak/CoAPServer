@@ -16,13 +16,14 @@ class SensorsResource(BaseResource):
     """
     CoAP resource representing sensors which can measure temperature.
 
-    objects = {
-       sensor_id: {
-           "name": "Sensor 1",
-           "temperature": 21,
-       },
-       ...
-    }
+    Example `objects` to be passed to constructor:
+        objects = {
+           1: {
+               "name": "Sensor 1",
+               "temperature": 21,
+           },
+           ...
+        }
     """
 
     def __init__(

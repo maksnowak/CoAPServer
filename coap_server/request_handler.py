@@ -17,10 +17,11 @@ class RequestHandler:
     """
     Handles incoming CoAP requests by routing them to the appropriate resource.
 
-    routes = {
-        "name": Resource(),
-        ...
-    }
+    Structure of `routes` to be passed to constructor:
+        routes = {
+            "name": Resource(),
+            ...
+        }
     """
 
     def __init__(self, routes: MutableMapping[str, BaseResource]):
@@ -83,6 +84,8 @@ class RequestHandler:
     def get_resource_method(
         self, request: CoapMessage, resource: BaseResource
     ) -> Callable[[CoapMessage], CoapMessage]:
+        """Returns the appropriate resource method based on the CoAP request method code."""
+
         if request.header_code == CoapCode.GET:
             return resource.get
         elif request.header_code == CoapCode.POST:

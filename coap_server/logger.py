@@ -1,3 +1,5 @@
+"""Module providing logging configuration for the CoAP server."""
+
 import logging
 
 logging.basicConfig(

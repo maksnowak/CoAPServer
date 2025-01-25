@@ -5,10 +5,10 @@ from coap_server.utils.constants import CoapMessage
 
 class BaseResource:
     """
-    Base class for resources.
+    Base class for defining CoAP resources.
 
     This class should be inherited by all resources.
-    It provides the basic methods, that should be implemented by the child classes.
+    Declares basic methods, that should be implemented by child classes.
     """
 
     objects: MutableMapping[int, MutableMapping[str, str | int]]

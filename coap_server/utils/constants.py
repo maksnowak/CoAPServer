@@ -3,6 +3,8 @@ from enum import Enum
 
 
 class CoapCode(Enum):
+    """Enum representing CoAP message codes."""
+
     EMPTY = "0.00"
     GET = "0.01"
     POST = "0.02"
@@ -52,6 +54,8 @@ class CoapCode(Enum):
 
 
 class CoapOption(Enum):
+    """Enum representing CoAP message options."""
+
     IF_MATCH = 1
     URI_HOST = 3
     ETAG = 4
@@ -71,9 +75,7 @@ class CoapOption(Enum):
 
 @dataclass(frozen=True)
 class CoapMessage:
-    """
-    CoAP message data class.
-    """
+    """Data class representing CoAP message."""
 
     header_version: int
     header_type: int
@@ -86,9 +88,7 @@ class CoapMessage:
 
     @property
     def uri(self) -> str:
-        """
-        Compose the URI from the options.
-        """
+        """Compose the URI from the options."""
 
         value = ""
         if CoapOption.URI_PATH in self.options:

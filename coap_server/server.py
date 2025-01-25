@@ -8,6 +8,10 @@ from coap_server.resources.base_resource import BaseResource
 
 
 class CoAPServer:
+    """
+    A simple CoAP server for handling CoAP requests and responses.
+    """
+
     def __init__(
         self,
         routes: MutableMapping[str, BaseResource],

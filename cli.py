@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+A CLI tool to send CoAP requests, similarly to the curl.
+"""
+
 import logging
 import socket
 from urllib.parse import urlparse

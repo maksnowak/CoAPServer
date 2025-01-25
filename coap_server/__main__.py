@@ -1,3 +1,7 @@
+"""
+Main script launching example CoAP server.
+"""
+
 import logging
 from typing import MutableMapping
 
