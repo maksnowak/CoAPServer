@@ -1,4 +1,4 @@
-# PSI Zespół 57 - Serwer CoAP
+# PSI Zespół 57 – Serwer CoAP
 
 *Autorzy: Michał Machnikowski, Maksymilian Nowak, Bruno Sienkiewicz*
 
@@ -140,7 +140,7 @@ make run
 
 Jest to plik zawierający definicję głównej klasy serwera, `CoAPServer`. Klasa ta przyjmuje jako parametry wejściowe strukturę `routes`, zawierającą informacje o dostępnych zasobach, `host` z adresem IP serwera oraz `port` z numerem portu, na którym serwer ma nasłuchiwać.
 
-Klasa posiada dwie metody - `start()` oraz `shutdown()`. Pierwsza z nich odpowiada za uruchomienie serwera, natomiast druga za jego zatrzymanie.
+Klasa posiada dwie metody – `start()` oraz `shutdown()`. Pierwsza z nich odpowiada za uruchomienie serwera, natomiast druga za jego zatrzymanie.
 
 ### `request_handler.py`
 
@@ -169,12 +169,12 @@ Serwer CoAP nie posiada interfejsu użytkownika. Po uruchomieniu serwera widoczn
 ## Flagi konfiguracyjne
 
 Nasza implementacja serwera CoAP posiada flagi konfiguracyjne, podawane w postaci argumentów wiersza poleceń. Są to:
-- `--host` - adres IP serwera
-- `--port` - numer portu, na którym serwer ma nasłuchiwać
-- `--verbose` - poziom szczegółowości logów
-    - `-v` - tylko ostrzeżenia
-    - `-vv` - ostrzeżenia oraz logi informacyjne
-    - `-vvv` - ostrzeżenia, logi informacyjne oraz debugowe
+- `--host` – adres IP serwera
+- `--port` – numer portu, na którym serwer ma nasłuchiwać
+- `--verbose` – poziom szczegółowości logów
+    - `-v` – tylko ostrzeżenia
+    - `-vv` – ostrzeżenia oraz logi informacyjne
+    - `-vvv` – ostrzeżenia, logi informacyjne oraz debugowe
 
 ## Postać logów
 
@@ -186,9 +186,9 @@ Logi mają następujący format:
 
 Gdzie:
 
-- `timestamp` - data i godzina zdarzenia
-- `log_level` - poziom logów (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-- `message` - treść logu
+- `timestamp` – data i godzina zdarzenia
+- `log_level` – poziom logów (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+- `message` – treść logu
 
 Oto przykładowy zapis logów:
 
@@ -203,12 +203,12 @@ Oto przykładowy zapis logów:
 
 ## Wykorzystane narzędzia
 
-- `Docker` - konteneryzacja aplikacji
-- `poetry` - zarządzanie zależnościami
-- `ruff` - linter oraz formatter
-- `mypy` - analiza statyczna
-- `pytest` - testy jednostkowe oraz integracyjne
-- `typer` - tworzenie interfejsu CLI
+- `Docker` – konteneryzacja aplikacji
+- `poetry` – zarządzanie zależnościami
+- `ruff` – linter oraz formatter
+- `mypy` – analiza statyczna
+- `pytest` – testy jednostkowe oraz integracyjne
+- `typer` – tworzenie interfejsu CLI
 
 ### Narzędzie CLI
 
@@ -224,14 +224,14 @@ python cli.py <uri> [options]
 
 Gdzie:
 
-- `uri` - adres URL serwera CoAP
-- `options` - dodatkowe opcje, zależne od żądania:
-    - `--method` - metoda żądania (GET, POST, PUT, DELETE)
-    - `--data` - dane do przesłania w żądaniu (dla POST i PUT)
-    - `--verbose` - poziom szczegółowości logów
-        - `-v` - tylko ostrzeżenia
-        - `-vv` - ostrzeżenia oraz logi informacyjne
-        - `-vvv` - ostrzeżenia, logi informacyjne oraz debugowe
+- `uri` – adres URL serwera CoAP
+- `options` – dodatkowe opcje, zależne od żądania:
+    - `--method` – metoda żądania (`GET`, `POST`, `PUT`, `DELETE`)
+    - `--data` – dane do przesłania w żądaniu (dla `POST` i `PUT`)
+    - `--verbose` – poziom szczegółowości logów
+        - `-v` – tylko ostrzeżenia
+        - `-vv` – ostrzeżenia oraz logi informacyjne
+        - `-vvv` – ostrzeżenia, logi informacyjne oraz debugowe
 
 ## Testy
 
@@ -260,6 +260,13 @@ make run
 #### 2. Wysłanie żądania GET do zasobu `/sensors`:
 
 ```bash
+poetry run python cli.py coap://127.0.0.1/sensors
+```
+
+lub
+
+```bash
+source .venv/bin/activate
 python cli.py coap://localhost:5683/sensors
 ```
 
@@ -268,7 +275,7 @@ python cli.py coap://localhost:5683/sensors
 Klient:
 
 ```
-(psi) (coap-server-py3.11) 09:06:22 maks@RYZEN:~/psi-projekt$ python3 cli.py coap://localhost:5683/sensors
+(psi) (coap-server-py3.11) 09:06:22 maks@RYZEN:~/psi-projekt$ python cli.py coap://localhost:5683/sensors
 Response Code: 2.05 Content
 Data: {"1": {"name": "Sensor 1", "temperature": 21}, "2": {"name": "Sensor 2", "temperature": 25}}
 (psi) (coap-server-py3.11) 09:48:58 maks@RYZEN:~/psi-projekt$
@@ -287,13 +294,13 @@ Serwer:
 2025-01-24 09:48:57,999 [DEBUG] Sent response to ('127.0.0.1', 40865)
 ```
 
-Żądanie zostało obsłużone poprawnie, serwer zwrócił kod odpowiedzi `CoapCode.CONTENT` oraz listę dostępnych czujników.
+Żądanie zostało obsłużone poprawnie i serwer zwrócił kod odpowiedzi `2.05 Content` oraz listę dostępnych czujników.
 
-Dodatkowo, w celu weryfikacji poprawności działania naszego narzędzia CLI, uruchomiliśmy ten sam test przy wykorzystaniu klienta `aiocoap`. W odpowiedzi otrzymaliśmy ten sam rezultat, co potwierdza poprawność działania naszego narzędzia.
+Dodatkowo, w celu weryfikacji poprawności działania naszego narzędzia CLI, uruchomiliśmy ten sam test, korzystając z zewnętrznej biblioteki klienckiej `aiocoap` (`cli_aiocoap.py`). W odpowiedzi otrzymaliśmy ten sam rezultat, co potwierdza poprawne zaimplementowanie protokołu CoAP.
 
 ### Pokrycie
 
-Pokrycie testami naszego serwera wynosi 82%.
+Pokrycie testami kodu naszego serwera wynosi 82%. W pliku `htmlcov/index.html` (wygenerowanym przez `make test`) można w czytelny sposób zobaczyć, ile wynosi pokrycie poszczególnych plików oraz które dokładnie linie nie są pokryte.
 
 ## Podsumowanie
 
