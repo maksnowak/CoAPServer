@@ -99,3 +99,11 @@ The server is containerized using Docker to simulate the system architecture. In
 ## License
 
 This project is open-source and available under the [GNU GPLv3 License](LICENSE).
+
+## Contributors
+
+<a href="https://github.com/maksnowak/CoAPServer/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=maksnowak/CoAPServer" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
